@@ -1,0 +1,24 @@
+namespace FatcrabTrading {};
+
+[Error]
+interface FatCrabError {
+    Simple(string description);
+};
+
+[Trait]
+interface MakeTradeWatching {
+    void notify(string notification);
+};
+
+interface MakeTrade {
+    [Throws=FatCrabError]
+    void watch(MakeTradeWatching watcher);
+};
+
+interface TakeTrade {};
+
+interface Trader {
+    void list_orders();
+    MakeTrade make_order();
+    TakeTrade take_order();
+};
