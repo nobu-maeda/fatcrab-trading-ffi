@@ -1,5 +1,16 @@
 namespace FatcrabTrading {};
 
+[Error]
+interface FatCrabError {
+  TxNotFound();
+  TxUnconfirmed();
+  Simple(string description);
+  N3xb(string description);
+  BdkBip39(string description);
+  Bdk(string description);
+  JoinError(string description);
+};
+
 [Enum]
 interface Auth {
   None();
@@ -21,8 +32,55 @@ interface BlockchainInfo {
   Rpc(string url, Auth auth, Network network);
 };
 
+dictionary RelayInfo {
+  string addr;
+  string? socket_addr;
+};
+
+enum FatCrabOrderType {
+  "Buy",
+  "Sell",
+};
+
+interface FatCrabOrder {
+  constructor(FatCrabOrderType order_type, string trade_uuid, f64 amount, f64 price);
+};
+
+interface FatCrabOrderEnvelope {
+
+};
+
+interface FatCrabMaker {
+
+};
+
+interface FatCrabTaker {
+  
+};
+
 interface Trader {
     constructor(BlockchainInfo info);
     [Name=new_with_keys]
     constructor(string key, BlockchainInfo info);
+    [Throws=FatCrabError]
+    string wallet_bip39_mnemonic();
+    [Throws=FatCrabError]
+    u64 wallet_spendable_balance();
+    [Throws=FatCrabError]
+    string wallet_generate_receive_address();
+    [Throws=FatCrabError]
+    string wallet_send_to_address(string address, u64 amount);
+    [Throws=FatCrabError]
+    void wallet_blockchain_sync();
+    string nostr_pubkey();
+    [Throws=FatCrabError]
+    void add_relays(sequence<RelayInfo> relays);
+    FatCrabMaker make_buy_order(FatCrabOrder order, string fatcrab_rx_addr);
+    FatCrabMaker make_sell_order(FatCrabOrder order);
+    [Throws=FatCrabError]
+    sequence<FatCrabOrderEnvelope> query_orders(FatCrabOrderType order_type);
+    FatCrabTaker take_buy_order(FatCrabOrderEnvelope order_envelope);
+    FatCrabTaker take_sell_order(FatCrabOrderEnvelope order_envelope, string fatcrab_rx_addr);
+    [Throws=FatCrabError]
+    void shutdown();
 };

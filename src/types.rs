@@ -20,6 +20,7 @@ impl From<Auth> for InnerAuth {
     }
 }
 
+#[derive(Clone)]
 pub enum Network {
     Bitcoin,
     Testnet,
@@ -64,4 +65,9 @@ impl From<BlockchainInfo> for InnerInfo {
             }
         }
     }
+}
+
+pub struct RelayInfo {
+    pub addr: String,
+    pub socket_addr: Option<String>,
 }
