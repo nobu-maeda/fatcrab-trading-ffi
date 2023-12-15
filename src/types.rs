@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use bitcoin::Network as InnerNetwork;
 use core_rpc::Auth as InnerAuth;
-
+use fatcrab_trading::common::BlockchainInfo as InnerInfo;
 
 pub enum Auth {
     None,
@@ -34,6 +34,34 @@ impl From<Network> for InnerNetwork {
             Network::Testnet => InnerNetwork::Testnet,
             Network::Signet => InnerNetwork::Signet,
             Network::Regtest => InnerNetwork::Regtest,
+        }
+    }
+}
+
+pub enum BlockchainInfo {
+    Electrum {
+        url: String,
+        network: Network,
+    },
+    Rpc {
+        url: String,
+        auth: Auth,
+        network: Network,
+    }
+}
+
+impl From<BlockchainInfo> for InnerInfo {
+    fn from(info: BlockchainInfo) -> Self {
+        match info {
+            BlockchainInfo::Electrum { url, network } => InnerInfo::Electrum {
+                url,
+                network: network.into(),
+            },
+            BlockchainInfo::Rpc { url, auth, network } => InnerInfo::Rpc {
+                url,
+                auth: auth.into(),
+                network: network.into(),
+            }
         }
     }
 }

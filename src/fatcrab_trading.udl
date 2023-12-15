@@ -15,8 +15,14 @@ interface Network {
   Regtest();
 };
 
+[Enum]
+interface BlockchainInfo {
+  Electrum(string url, Network network);
+  Rpc(string url, Auth auth, Network network);
+};
+
 interface Trader {
-    constructor(string url, Auth auth, Network network);
+    constructor(BlockchainInfo info);
     [Name=new_with_keys]
-    constructor(string key, string url, Auth auth, Network network);
+    constructor(string key, BlockchainInfo info);
 };

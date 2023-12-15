@@ -5,23 +5,23 @@ use secp256k1::SecretKey;
 
 use fatcrab_trading::trader::FatCrabTrader as InnerTrader;
 
-use crate::types::{Auth, Network};
 use crate::RUNTIME;
+use crate::types::BlockchainInfo;
 
 pub struct Trader {
     inner: InnerTrader,
 }
 
 impl Trader {
-    pub fn new(url: String, auth: Auth, network: Network) -> Self {
-        let inner = RUNTIME.block_on(async { InnerTrader::new(url, auth.into(), network.into()).await });
+    pub fn new(info: BlockchainInfo) -> Self {
+        let inner = RUNTIME.block_on(async { InnerTrader::new(info.into()).await });
         Self { inner }
     }
 
-    pub fn new_with_keys(key: String, url: String, auth: Auth, network: Network) -> Self {
+    pub fn new_with_keys(key: String, info: BlockchainInfo) -> Self {
         let secret_key = SecretKey::from_str(&key).unwrap();
         let inner = RUNTIME.block_on(async {
-            InnerTrader::new_with_keys(secret_key, url, auth.into(), network.into()).await
+            InnerTrader::new_with_keys(secret_key, info.into()).await
         });
         Self { inner }
     }
