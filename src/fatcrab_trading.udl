@@ -1,24 +1,22 @@
 namespace FatcrabTrading {};
 
-[Error]
-interface FatCrabError {
-    Simple(string description);
+[Enum]
+interface Auth {
+  None();
+  UserPass(string username, string password);
+  Cookie(string file);
 };
 
-[Trait]
-interface MakeTradeWatching {
-    void notify(string notification);
+[Enum]
+interface Network {
+  Bitcoin();
+  Testnet();
+  Signet();
+  Regtest();
 };
-
-interface MakeTrade {
-    [Throws=FatCrabError]
-    void watch(MakeTradeWatching watcher);
-};
-
-interface TakeTrade {};
 
 interface Trader {
-    void list_orders();
-    MakeTrade make_order();
-    TakeTrade take_order();
+    constructor(string url, Auth auth, Network network);
+    [Name=new_with_keys]
+    constructor(string key, string url, Auth auth, Network network);
 };
