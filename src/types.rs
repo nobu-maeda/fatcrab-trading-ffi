@@ -1,8 +1,9 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, sync::Arc};
 
 use bitcoin::Network as InnerNetwork;
 use core_rpc::Auth as InnerAuth;
-use fatcrab_trading::common::BlockchainInfo as InnerInfo;
+use fatcrab_trading::{common::BlockchainInfo as InnerInfo, offer::FatCrabOfferEnvelope, trade_rsp::FatCrabTradeRspEnvelope, peer::FatCrabPeerEnvelope};
+pub use fatcrab_trading::{maker::FatCrabMakerNotif, taker::FatCrabTakerNotif};
 
 pub enum Auth {
     None,
@@ -70,4 +71,14 @@ impl From<BlockchainInfo> for InnerInfo {
 pub struct RelayInfo {
     pub addr: String,
     pub socket_addr: Option<String>,
+}
+
+pub trait FatCrabMakerNotifDelegate: Sync + Send {
+    fn on_maker_offer_notif(&self, offer_envelope: Arc<FatCrabOfferEnvelope>);
+    fn on_maker_peer_notif(&self, peer_envelope: Arc<FatCrabPeerEnvelope>);
+}
+
+pub trait FatCrabTakerNotifDelegate: Sync + Send {
+    fn on_taker_trade_rsp_notif(&self, trade_rsp_envelope: Arc<FatCrabTradeRspEnvelope>);
+    fn on_taker_peer_notif(&self, peer_envelope: Arc<FatCrabPeerEnvelope>);
 }

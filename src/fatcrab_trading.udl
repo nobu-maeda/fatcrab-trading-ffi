@@ -42,6 +42,11 @@ enum FatCrabOrderType {
   "Sell",
 };
 
+enum FatCrabTradeRspType {
+  "Accept",
+  "Reject",
+};
+
 interface FatCrabOrder {
   constructor(FatCrabOrderType order_type, string trade_uuid, f64 amount, f64 price);
 };
@@ -50,15 +55,67 @@ interface FatCrabOrderEnvelope {
 
 };
 
-interface FatCrabMaker {
+interface FatCrabOfferEnvelope {
 
 };
 
-interface FatCrabTaker {
+interface FatCrabTradeRspEnvelope {
+
+};
+
+interface FatCrabPeerEnvelope {
+
+};
+
+[Trait]
+interface FatCrabMakerNotifDelegate {
+  void on_maker_offer_notif(FatCrabOfferEnvelope offer_envelope);
+  void on_maker_peer_notif(FatCrabPeerEnvelope peer_envelope);
+};
+
+[Trait]
+interface FatCrabTakerNotifDelegate {
+  void on_taker_trade_rsp_notif(FatCrabTradeRspEnvelope trade_rsp_envelope);
+  void on_taker_peer_notif(FatCrabPeerEnvelope peer_envelope);
+};
+
+interface FatCrabBuyMaker {
+  [Throws=FatCrabError]
+  void trade_response(FatCrabTradeRspType trade_rsp_type, FatCrabOfferEnvelope offer_envelope);
+  [Throws=FatCrabError]
+  void release_notify_peer();
+  [Throws=FatCrabError]
+  void trade_complete();
+  [Throws=FatCrabError]
+  void register_notif_delegate(FatCrabMakerNotifDelegate delegate);
+  [Throws=FatCrabError]
+  void unregister_notif_delegate();
+};
+
+interface FatCrabSellMaker {
+  [Throws=FatCrabError]
+  void trade_response(FatCrabTradeRspType trade_rsp_type, FatCrabOfferEnvelope offer_envelope);
+  [Throws=FatCrabError]
+  u32 check_btc_tx_confirmation();
+  [Throws=FatCrabError]
+  void notify_peer(string fatcrab_txid);
+  [Throws=FatCrabError]
+  void trade_complete();
+  [Throws=FatCrabError]
+  void register_notif_delegate(FatCrabMakerNotifDelegate delegate);
+  [Throws=FatCrabError]
+  void unregister_notif_delegate();
+};
+
+interface FatCrabBuyTaker {
   
 };
 
-interface Trader {
+interface FatCrabSellTaker {
+  
+};
+
+interface FatCrabTrader {
     constructor(BlockchainInfo info);
     [Name=new_with_keys]
     constructor(string key, BlockchainInfo info);
@@ -75,12 +132,12 @@ interface Trader {
     string nostr_pubkey();
     [Throws=FatCrabError]
     void add_relays(sequence<RelayInfo> relays);
-    FatCrabMaker make_buy_order(FatCrabOrder order, string fatcrab_rx_addr);
-    FatCrabMaker make_sell_order(FatCrabOrder order);
+    FatCrabBuyMaker make_buy_order(FatCrabOrder order, string fatcrab_rx_addr);
+    FatCrabSellMaker make_sell_order(FatCrabOrder order);
     [Throws=FatCrabError]
     sequence<FatCrabOrderEnvelope> query_orders(FatCrabOrderType order_type);
-    FatCrabTaker take_buy_order(FatCrabOrderEnvelope order_envelope);
-    FatCrabTaker take_sell_order(FatCrabOrderEnvelope order_envelope, string fatcrab_rx_addr);
+    FatCrabBuyTaker take_buy_order(FatCrabOrderEnvelope order_envelope);
+    FatCrabSellTaker take_sell_order(FatCrabOrderEnvelope order_envelope, string fatcrab_rx_addr);
     [Throws=FatCrabError]
     void shutdown();
 };

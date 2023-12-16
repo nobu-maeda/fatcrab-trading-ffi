@@ -1,19 +1,25 @@
-use fatcrab_trading::taker::{FatCrabTakerAccessEnum as InnerTaker, FatCrabTakerAccess, TakerBuy, TakerSell};
+use fatcrab_trading::taker::{FatCrabTakerAccess, TakerBuy, TakerSell};
 
-pub struct FatCrabTaker {
-    inner: InnerTaker,
+pub struct FatCrabBuyTaker {
+    inner: FatCrabTakerAccess<TakerBuy>,
 }
 
-impl FatCrabTaker {
-    pub(crate) fn new_with_buy_order(taker: FatCrabTakerAccess<TakerBuy>) -> Self {
+pub struct FatCrabSellTaker {
+    inner: FatCrabTakerAccess<TakerSell>,
+}
+
+impl FatCrabBuyTaker {
+    pub(crate) fn new(taker: FatCrabTakerAccess<TakerBuy>) -> Self {
         Self {
-            inner: InnerTaker::Buy(taker),
+            inner: taker,
         }
     }
+}
 
-    pub(crate) fn new_with_sell_order(taker: FatCrabTakerAccess<TakerSell>) -> Self {
+impl FatCrabSellTaker {
+    pub(crate) fn new(taker: FatCrabTakerAccess<TakerSell>) -> Self {
         Self {
-            inner: InnerTaker::Sell(taker),
+            inner: taker,
         }
     }
 }
