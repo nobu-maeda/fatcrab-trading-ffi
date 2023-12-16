@@ -1,11 +1,10 @@
 
 use std::net::SocketAddr;
-use std::ops::Deref;
 use std::str::FromStr;
 use std::sync::Arc;
 
 use bitcoin::{Address, Network};
-use fatcrab_trading::order::{FatCrabOrderType, FatCrabOrderEnvelope, self};
+use fatcrab_trading::order::{FatCrabOrderType, FatCrabOrderEnvelope};
 use secp256k1::SecretKey;
 
 use fatcrab_trading::trader::FatCrabTrader as InnerTrader;
@@ -151,7 +150,11 @@ impl Trader {
         Arc::new(FatCrabTaker::new_with_sell_order(taker_access))
     }
 
-    pub fn shutdown(self) -> Result<(), FatCrabError> {
-        RUNTIME.block_on(async { self.inner.shutdown().await }).map_err(|e| e.into())
+    pub fn shutdown(&self) -> Result<(), FatCrabError> {
+        // TODO: FFI requires shared reference to self as argument
+        // But Trader Shutdown is a self consuming method
+        // Not sure how to do this at this point. Ommitting for now
+        // RUNTIME.block_on(async { self.inner.shutdown().await }).map_err(|e| e.into())
+        Ok(())
     }
 }
