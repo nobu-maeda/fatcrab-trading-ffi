@@ -108,11 +108,25 @@ interface FatCrabSellMaker {
 };
 
 interface FatCrabBuyTaker {
-  
+  [Throws=FatCrabError]
+  void notify_peer(string fatcrab_txid);
+  [Throws=FatCrabError]
+  u32 check_btc_tx_confirmation();
+  [Throws=FatCrabError]
+  void trade_complete();
+  [Throws=FatCrabError]
+  void register_notif_delegate(FatCrabTakerNotifDelegate delegate);
+  [Throws=FatCrabError]
+  void unregister_notif_delegate();
 };
 
 interface FatCrabSellTaker {
-  
+  [Throws=FatCrabError]
+  void trade_complete();
+  [Throws=FatCrabError]
+  void register_notif_delegate(FatCrabTakerNotifDelegate delegate);
+  [Throws=FatCrabError]
+  void unregister_notif_delegate();
 };
 
 interface FatCrabTrader {
