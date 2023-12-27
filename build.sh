@@ -1,4 +1,4 @@
-NAME="FatcrabTrading"
+NAME="FatCrabTrading"
 APP_NAME="OceanSea"
 HEADERPATH="bindings/${NAME}FFI.h"
 TARGETDIR="target"

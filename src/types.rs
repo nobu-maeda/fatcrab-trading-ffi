@@ -2,8 +2,12 @@ use std::{path::PathBuf, sync::Arc};
 
 use bitcoin::Network as InnerNetwork;
 use core_rpc::Auth as InnerAuth;
-use fatcrab_trading::{common::BlockchainInfo as InnerInfo, offer::FatCrabOfferEnvelope, trade_rsp::FatCrabTradeRspEnvelope, peer::FatCrabPeerEnvelope};
+use fatcrab_trading::common::BlockchainInfo as InnerInfo;
 pub use fatcrab_trading::{maker::FatCrabMakerNotif, taker::FatCrabTakerNotif};
+
+pub use crate::{
+    offer::FatCrabOfferEnvelope, peer::FatCrabPeerEnvelope, trade_rsp::FatCrabTradeRspEnvelope,
+};
 
 pub enum Auth {
     None,
@@ -49,7 +53,7 @@ pub enum BlockchainInfo {
         url: String,
         auth: Auth,
         network: Network,
-    }
+    },
 }
 
 impl From<BlockchainInfo> for InnerInfo {
@@ -63,7 +67,7 @@ impl From<BlockchainInfo> for InnerInfo {
                 url,
                 auth: auth.into(),
                 network: network.into(),
-            }
+            },
         }
     }
 }

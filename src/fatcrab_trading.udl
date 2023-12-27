@@ -1,4 +1,4 @@
-namespace FatcrabTrading {};
+namespace FatCrabTrading {};
 
 [Error]
 interface FatCrabError {
@@ -8,7 +8,10 @@ interface FatCrabError {
   N3xb(string description);
   BdkBip39(string description);
   Bdk(string description);
+  Io(string description);
   JoinError(string description);
+  SerdesJson(string description);
+  UrlParse(string description);
 };
 
 [Enum]
@@ -18,12 +21,11 @@ interface Auth {
   Cookie(string file);
 };
 
-[Enum]
-interface Network {
-  Bitcoin();
-  Testnet();
-  Signet();
-  Regtest();
+enum Network {
+  "Bitcoin",
+  "Testnet",
+  "Signet",
+  "Regtest",
 };
 
 [Enum]
@@ -47,12 +49,26 @@ enum FatCrabTradeRspType {
   "Reject",
 };
 
-interface FatCrabOrder {
-  constructor(FatCrabOrderType order_type, string trade_uuid, f64 amount, f64 price);
+dictionary FatCrabOrder {
+  FatCrabOrderType order_type;
+  string trade_uuid;
+  f64 amount;
+  f64 price;
+};
+
+[Enum]
+interface FatCrabTradeRsp {
+  Accept(string receive_address);
+  Reject();
+};
+
+dictionary FatCrabPeerMessage {
+  string receive_address;
+  string txid;
 };
 
 interface FatCrabOrderEnvelope {
-
+  FatCrabOrder order();
 };
 
 interface FatCrabOfferEnvelope {
@@ -60,11 +76,11 @@ interface FatCrabOfferEnvelope {
 };
 
 interface FatCrabTradeRspEnvelope {
-
+  FatCrabTradeRsp trade_rsp();
 };
 
 interface FatCrabPeerEnvelope {
-
+  FatCrabPeerMessage message();
 };
 
 [Trait]
@@ -145,7 +161,7 @@ interface FatCrabTrader {
     void wallet_blockchain_sync();
     string nostr_pubkey();
     [Throws=FatCrabError]
-    void add_relays(sequence<RelayInfo> relays);
+    void add_relays(sequence<RelayInfo> relays_info);
     FatCrabBuyMaker make_buy_order(FatCrabOrder order, string fatcrab_rx_addr);
     FatCrabSellMaker make_sell_order(FatCrabOrder order);
     [Throws=FatCrabError]

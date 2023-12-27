@@ -18,7 +18,8 @@ bitcoin = "0.30"
 core-rpc = "0.17"
 secp256k1 = "0.27"
 thiserror = "1.0.50"
-uuid = { version = "1.4", features = ["serde", "v4"] }
+url = "2.0"
+uuid = { version = "1.4", features = ["v4"] }
 
 fatcrab-trading = { path = "../fatcrab-trading" }
 uniffi = { version = "0.25.2", features = ["cli"] }
