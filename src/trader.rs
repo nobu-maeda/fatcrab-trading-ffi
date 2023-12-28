@@ -22,26 +22,27 @@ pub struct FatCrabTrader {
 }
 
 impl FatCrabTrader {
-    pub fn new(info: BlockchainInfo) -> Self {
+    pub fn new(info: BlockchainInfo, app_dir_path: String) -> Self {
         let network = match &info {
             BlockchainInfo::Electrum { network, .. } => network.to_owned(),
             BlockchainInfo::Rpc { network, .. } => network.to_owned(),
         };
-        let inner = RUNTIME.block_on(async { InnerTrader::new(info.into()).await });
+        let inner = RUNTIME.block_on(async { InnerTrader::new(info.into(), app_dir_path).await });
         Self {
             inner,
             network: network.into(),
         }
     }
 
-    pub fn new_with_keys(key: String, info: BlockchainInfo) -> Self {
+    pub fn new_with_keys(key: String, info: BlockchainInfo, app_dir_path: String) -> Self {
         let network = match &info {
             BlockchainInfo::Electrum { network, .. } => network.to_owned(),
             BlockchainInfo::Rpc { network, .. } => network.to_owned(),
         };
         let secret_key = SecretKey::from_str(&key).unwrap();
-        let inner =
-            RUNTIME.block_on(async { InnerTrader::new_with_key(secret_key, info.into()).await });
+        let inner = RUNTIME.block_on(async {
+            InnerTrader::new_with_key(secret_key, info.into(), app_dir_path).await
+        });
         Self {
             inner,
             network: network.into(),
@@ -135,7 +136,7 @@ impl FatCrabTrader {
 
     pub fn query_orders(
         &self,
-        order_type: FatCrabOrderType,
+        order_type: Option<FatCrabOrderType>,
     ) -> Result<Vec<Arc<FatCrabOrderEnvelope>>, FatCrabError> {
         match RUNTIME.block_on(async { self.inner.query_orders(order_type).await }) {
             Ok(order_envelopes) => Ok(order_envelopes

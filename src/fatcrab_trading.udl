@@ -146,9 +146,9 @@ interface FatCrabSellTaker {
 };
 
 interface FatCrabTrader {
-    constructor(BlockchainInfo info);
+    constructor(BlockchainInfo info, string app_dir_path);
     [Name=new_with_keys]
-    constructor(string key, BlockchainInfo info);
+    constructor(string key, BlockchainInfo info, string app_dir_path);
     [Throws=FatCrabError]
     string wallet_bip39_mnemonic();
     [Throws=FatCrabError]
@@ -165,7 +165,7 @@ interface FatCrabTrader {
     FatCrabBuyMaker make_buy_order(FatCrabOrder order, string fatcrab_rx_addr);
     FatCrabSellMaker make_sell_order(FatCrabOrder order);
     [Throws=FatCrabError]
-    sequence<FatCrabOrderEnvelope> query_orders(FatCrabOrderType order_type);
+    sequence<FatCrabOrderEnvelope> query_orders(FatCrabOrderType? order_type);
     FatCrabBuyTaker take_buy_order(FatCrabOrderEnvelope order_envelope);
     FatCrabSellTaker take_sell_order(FatCrabOrderEnvelope order_envelope, string fatcrab_rx_addr);
     [Throws=FatCrabError]
