@@ -147,8 +147,8 @@ interface FatCrabSellTaker {
 
 interface FatCrabTrader {
     constructor(BlockchainInfo info, string app_dir_path);
-    [Name=new_with_keys]
-    constructor(string key, BlockchainInfo info, string app_dir_path);
+    [Name=new_with_mnemonic]
+    constructor(string mnemonic, BlockchainInfo info, string app_dir_path);
     [Throws=FatCrabError]
     string wallet_bip39_mnemonic();
     [Throws=FatCrabError]

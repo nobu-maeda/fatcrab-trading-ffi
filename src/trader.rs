@@ -34,12 +34,19 @@ impl FatCrabTrader {
         }
     }
 
-    pub fn new_with_keys(key: String, info: BlockchainInfo, app_dir_path: String) -> Self {
+    pub fn new_with_mnemonic(mnemonic: String, info: BlockchainInfo, app_dir_path: String) -> Self {
         let network = match &info {
             BlockchainInfo::Electrum { network, .. } => network.to_owned(),
             BlockchainInfo::Rpc { network, .. } => network.to_owned(),
         };
-        let secret_key = SecretKey::from_str(&key).unwrap();
+        let entropy = match bip39::Mnemonic::parse(mnemonic) {
+            Ok(mnemonic) => mnemonic.to_entropy(),
+            Err(error) => panic!("Invalid mnemonic - {}", error),
+        };
+        let secret_key = match SecretKey::from_slice(&entropy) {
+            Ok(secret_key) => secret_key,
+            Err(error) => panic!("Cannot make key from mnemonic - {}", error),
+        };
         let inner = RUNTIME.block_on(async {
             InnerTrader::new_with_key(secret_key, info.into(), app_dir_path).await
         });
