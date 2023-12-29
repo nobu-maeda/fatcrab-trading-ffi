@@ -154,6 +154,8 @@ interface FatCrabTrader {
     [Throws=FatCrabError]
     u64 wallet_spendable_balance();
     [Throws=FatCrabError]
+    u64 wallet_allocated_amount();
+    [Throws=FatCrabError]
     string wallet_generate_receive_address();
     [Throws=FatCrabError]
     string wallet_send_to_address(string address, u64 amount);

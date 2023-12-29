@@ -63,6 +63,12 @@ impl FatCrabTrader {
             .map_err(|e| e.into())
     }
 
+    pub fn wallet_allocated_amount(&self) -> Result<u64, FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.wallet_allocated_amount().await })
+            .map_err(|e| e.into())
+    }
+
     pub fn wallet_generate_receive_address(&self) -> Result<String, FatCrabError> {
         let result = RUNTIME.block_on(async { self.inner.wallet_generate_receive_address().await });
         match result {
