@@ -128,22 +128,22 @@ impl FatCrabTrader {
             .map_err(|e| e.into())
     }
 
-    pub fn make_buy_order(
+    pub fn new_buy_maker(
         &self,
         order: FatCrabOrder,
         fatcrab_rx_addr: String,
     ) -> Arc<FatCrabBuyMaker> {
         let maker_access = RUNTIME.block_on(async {
             self.inner
-                .make_buy_order(&order.into(), fatcrab_rx_addr)
+                .new_buy_maker(&order.into(), fatcrab_rx_addr)
                 .await
         });
         Arc::new(FatCrabBuyMaker::new(maker_access))
     }
 
-    pub fn make_sell_order(&self, order: FatCrabOrder) -> Arc<FatCrabSellMaker> {
+    pub fn new_sell_maker(&self, order: FatCrabOrder) -> Arc<FatCrabSellMaker> {
         let maker_access =
-            RUNTIME.block_on(async { self.inner.make_sell_order(&order.into()).await });
+            RUNTIME.block_on(async { self.inner.new_sell_maker(&order.into()).await });
         Arc::new(FatCrabSellMaker::new(maker_access))
     }
 
@@ -160,17 +160,14 @@ impl FatCrabTrader {
         }
     }
 
-    pub fn take_buy_order(
-        &self,
-        order_envelope: Arc<FatCrabOrderEnvelope>,
-    ) -> Arc<FatCrabBuyTaker> {
+    pub fn new_buy_taker(&self, order_envelope: Arc<FatCrabOrderEnvelope>) -> Arc<FatCrabBuyTaker> {
         let order_envelope = order_envelope.as_ref().clone();
         let taker_access =
-            RUNTIME.block_on(async { self.inner.take_buy_order(&order_envelope.into()).await });
+            RUNTIME.block_on(async { self.inner.new_buy_taker(&order_envelope.into()).await });
         Arc::new(FatCrabBuyTaker::new(taker_access))
     }
 
-    pub fn take_sell_order(
+    pub fn new_sell_taker(
         &self,
         order_envelope: Arc<FatCrabOrderEnvelope>,
         fatcrab_rx_addr: String,
@@ -180,7 +177,7 @@ impl FatCrabTrader {
             fatcrab_trading::taker::TakerSell,
         > = RUNTIME.block_on(async {
             self.inner
-                .take_sell_order(&order_envelope.into(), fatcrab_rx_addr)
+                .new_sell_taker(&order_envelope.into(), fatcrab_rx_addr)
                 .await
         });
         Arc::new(FatCrabSellTaker::new(taker_access))

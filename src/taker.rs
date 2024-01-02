@@ -21,6 +21,12 @@ impl FatCrabBuyTaker {
         Self { inner: taker }
     }
 
+    pub fn take_order(&self) -> Result<(), FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.take_order().await })
+            .map_err(|e| e.into())
+    }
+
     pub fn notify_peer(&self, txid: String) -> Result<(), FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.notify_peer(txid).await })
@@ -74,6 +80,12 @@ impl FatCrabBuyTaker {
 impl FatCrabSellTaker {
     pub(crate) fn new(taker: FatCrabTakerAccess<TakerSell>) -> Self {
         Self { inner: taker }
+    }
+
+    pub fn take_order(&self) -> Result<(), FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.take_order().await })
+            .map_err(|e| e.into())
     }
 
     pub fn trade_complete(&self) -> Result<(), FatCrabError> {

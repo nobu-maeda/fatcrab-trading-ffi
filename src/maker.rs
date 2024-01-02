@@ -23,6 +23,12 @@ impl FatCrabBuyMaker {
         Self { inner: maker }
     }
 
+    pub fn post_new_order(&self) -> Result<(), FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.post_new_order().await })
+            .map_err(|e| e.into())
+    }
+
     pub fn trade_response(
         &self,
         trade_rsp_type: FatCrabTradeRspType,
@@ -86,6 +92,13 @@ impl FatCrabSellMaker {
     pub(crate) fn new(maker: FatCrabMakerAccess<MakerSell>) -> Self {
         Self { inner: maker }
     }
+
+    pub fn post_new_order(&self) -> Result<(), FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.post_new_order().await })
+            .map_err(|e| e.into())
+    }
+
     pub fn trade_response(
         &self,
         trade_rsp_type: FatCrabTradeRspType,
