@@ -12,6 +12,8 @@ interface FatCrabError {
   JoinError(string description);
   SerdesJson(string description);
   UrlParse(string description);
+  MpscSend(string description);
+  OneshotRecv(string description);
 };
 
 [Enum]

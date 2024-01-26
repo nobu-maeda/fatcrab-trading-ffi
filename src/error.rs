@@ -15,6 +15,8 @@ pub enum FatCrabError {
     JoinError { description: String },
     SerdesJson { description: String },
     UrlParse { description: String },
+    MpscSend { description: String },
+    OneshotRecv { description: String },
 }
 
 impl Error for FatCrabError {}
@@ -43,6 +45,10 @@ impl From<InnerError> for FatCrabError {
             InnerError::SerdesJson { error } => Self::SerdesJson {
                 description: error.to_string(),
             },
+            InnerError::MpscSend { description } => Self::Simple { description },
+            InnerError::OneshotRecv { error } => Self::Simple {
+                description: error.to_string(),
+            },
         }
     }
 }
@@ -69,6 +75,12 @@ impl Display for FatCrabError {
             }
             FatCrabError::UrlParse { description } => {
                 format!("FatCrab-Error | UrlParse - {}", description)
+            }
+            FatCrabError::MpscSend { description } => {
+                format!("FatCrab-Error | MpscSend - {}", description)
+            }
+            FatCrabError::OneshotRecv { description } => {
+                format!("FatCrab-Error | OneshotRecv - {}", description)
             }
         };
         write!(f, "{}", error_string)
