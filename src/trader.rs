@@ -132,19 +132,25 @@ impl FatCrabTrader {
         &self,
         order: FatCrabOrder,
         fatcrab_rx_addr: String,
-    ) -> Arc<FatCrabBuyMaker> {
-        let maker_access = RUNTIME.block_on(async {
+    ) -> Result<Arc<FatCrabBuyMaker>, FatCrabError> {
+        match RUNTIME.block_on(async {
             self.inner
                 .new_buy_maker(&order.into(), fatcrab_rx_addr)
                 .await
-        });
-        Arc::new(FatCrabBuyMaker::new(maker_access))
+        }) {
+            Ok(maker_access) => Ok(Arc::new(FatCrabBuyMaker::new(maker_access))),
+            Err(e) => Err(e.into()),
+        }
     }
 
-    pub fn new_sell_maker(&self, order: FatCrabOrder) -> Arc<FatCrabSellMaker> {
-        let maker_access =
-            RUNTIME.block_on(async { self.inner.new_sell_maker(&order.into()).await });
-        Arc::new(FatCrabSellMaker::new(maker_access))
+    pub fn new_sell_maker(
+        &self,
+        order: FatCrabOrder,
+    ) -> Result<Arc<FatCrabSellMaker>, FatCrabError> {
+        match RUNTIME.block_on(async { self.inner.new_sell_maker(&order.into()).await }) {
+            Ok(maker_access) => Ok(Arc::new(FatCrabSellMaker::new(maker_access))),
+            Err(e) => Err(e.into()),
+        }
     }
 
     pub fn query_orders(
@@ -160,27 +166,31 @@ impl FatCrabTrader {
         }
     }
 
-    pub fn new_buy_taker(&self, order_envelope: Arc<FatCrabOrderEnvelope>) -> Arc<FatCrabBuyTaker> {
+    pub fn new_buy_taker(
+        &self,
+        order_envelope: Arc<FatCrabOrderEnvelope>,
+    ) -> Result<Arc<FatCrabBuyTaker>, FatCrabError> {
         let order_envelope = order_envelope.as_ref().clone();
-        let taker_access =
-            RUNTIME.block_on(async { self.inner.new_buy_taker(&order_envelope.into()).await });
-        Arc::new(FatCrabBuyTaker::new(taker_access))
+        match RUNTIME.block_on(async { self.inner.new_buy_taker(&order_envelope.into()).await }) {
+            Ok(taker_access) => Ok(Arc::new(FatCrabBuyTaker::new(taker_access))),
+            Err(e) => Err(e.into()),
+        }
     }
 
     pub fn new_sell_taker(
         &self,
         order_envelope: Arc<FatCrabOrderEnvelope>,
         fatcrab_rx_addr: String,
-    ) -> Arc<FatCrabSellTaker> {
+    ) -> Result<Arc<FatCrabSellTaker>, FatCrabError> {
         let order_envelope = order_envelope.as_ref().clone();
-        let taker_access: fatcrab_trading::taker::FatCrabTakerAccess<
-            fatcrab_trading::taker::TakerSell,
-        > = RUNTIME.block_on(async {
+        match RUNTIME.block_on(async {
             self.inner
                 .new_sell_taker(&order_envelope.into(), fatcrab_rx_addr)
                 .await
-        });
-        Arc::new(FatCrabSellTaker::new(taker_access))
+        }) {
+            Ok(taker_access) => Ok(Arc::new(FatCrabSellTaker::new(taker_access))),
+            Err(e) => Err(e.into()),
+        }
     }
 
     pub fn shutdown(&self) -> Result<(), FatCrabError> {

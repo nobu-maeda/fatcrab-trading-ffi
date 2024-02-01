@@ -174,11 +174,15 @@ interface FatCrabTrader {
     string nostr_pubkey();
     [Throws=FatCrabError]
     void add_relays(sequence<RelayInfo> relays_info);
+    [Throws=FatCrabError]
     FatCrabBuyMaker new_buy_maker(FatCrabOrder order, string fatcrab_rx_addr);
+    [Throws=FatCrabError]
     FatCrabSellMaker new_sell_maker(FatCrabOrder order);
     [Throws=FatCrabError]
     sequence<FatCrabOrderEnvelope> query_orders(FatCrabOrderType? order_type);
+    [Throws=FatCrabError]
     FatCrabBuyTaker new_buy_taker(FatCrabOrderEnvelope order_envelope);
+    [Throws=FatCrabError]
     FatCrabSellTaker new_sell_taker(FatCrabOrderEnvelope order_envelope, string fatcrab_rx_addr);
     [Throws=FatCrabError]
     void shutdown();
