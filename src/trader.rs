@@ -13,7 +13,7 @@ use crate::error::FatCrabError;
 use crate::maker::{FatCrabBuyMaker, FatCrabSellMaker};
 use crate::order::{FatCrabOrder, FatCrabOrderEnvelope};
 use crate::taker::{FatCrabBuyTaker, FatCrabSellTaker};
-use crate::types::{BlockchainInfo, RelayInfo};
+use crate::types::{BlockchainInfo, RelayAddr, RelayInfo};
 use crate::RUNTIME;
 
 pub struct FatCrabTrader {
@@ -111,20 +111,38 @@ impl FatCrabTrader {
             .to_string()
     }
 
-    pub fn add_relays(&self, relays_info: Vec<RelayInfo>) -> Result<(), FatCrabError> {
+    pub fn add_relays(&self, relay_addrs: Vec<RelayAddr>) -> Result<(), FatCrabError> {
         let mut relays = Vec::new();
 
-        for relay_info in relays_info {
-            let socket = match relay_info.socket_addr {
+        for relay_addr in relay_addrs {
+            let socket = match relay_addr.socket_addr {
                 Some(socket_str) => SocketAddr::from_str(&socket_str).ok(),
                 None => None,
             };
-            let url = Url::parse(&relay_info.addr)?;
+            let url = Url::parse(&relay_addr.url)?;
             relays.push((url, socket));
         }
 
         RUNTIME
             .block_on(async { self.inner.add_relays(relays).await })
+            .map_err(|e| e.into())
+    }
+
+    pub fn get_relays(&self) -> Vec<RelayInfo> {
+        RUNTIME.block_on(async {
+            self.inner
+                .get_relays()
+                .await
+                .into_iter()
+                .map(|relay| relay.into())
+                .collect()
+        })
+    }
+
+    pub fn remove_relay(&self, url: String) -> Result<(), FatCrabError> {
+        let url = Url::parse(&url)?;
+        RUNTIME
+            .block_on(async { self.inner.remove_relay(url).await })
             .map_err(|e| e.into())
     }
 

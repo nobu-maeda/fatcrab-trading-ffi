@@ -36,9 +36,41 @@ interface BlockchainInfo {
   Rpc(string url, Auth auth, Network network);
 };
 
-dictionary RelayInfo {
-  string addr;
+dictionary RelayAddr {
+  string url;
   string? socket_addr;
+};
+
+enum RelayStatus {
+    "Initialized",
+    "Pending",
+    "Connecting",
+    "Connected",
+    "Disconnected",
+    "Stopped",
+    "Terminated",
+};
+
+dictionary RelayInformationDocument {
+  string? name;
+  string? description;
+  string? pubkey;
+  string? contact;
+  sequence<u16>? supported_nips;
+  string? software;
+  string? version;
+  sequence<string> relay_countries;
+  sequence<string> language_tags;
+  sequence<string> tags;
+  string? posting_policy;
+  string? payments_url;
+  string? icon;
+};
+
+dictionary RelayInfo {
+  string url;
+  RelayStatus status;
+  RelayInformationDocument document;
 };
 
 enum FatCrabOrderType {
@@ -173,7 +205,10 @@ interface FatCrabTrader {
     void wallet_blockchain_sync();
     string nostr_pubkey();
     [Throws=FatCrabError]
-    void add_relays(sequence<RelayInfo> relays_info);
+    void add_relays(sequence<RelayAddr> relay_addrs);
+    sequence<RelayInfo> get_relays();
+    [Throws=FatCrabError]
+    void remove_relay(string url);
     [Throws=FatCrabError]
     FatCrabBuyMaker new_buy_maker(FatCrabOrder order, string fatcrab_rx_addr);
     [Throws=FatCrabError]

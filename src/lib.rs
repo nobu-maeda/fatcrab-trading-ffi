@@ -22,5 +22,6 @@ use taker::{FatCrabBuyTaker, FatCrabSellTaker};
 use trade_rsp::{FatCrabTradeRsp, FatCrabTradeRspEnvelope, FatCrabTradeRspType};
 use trader::FatCrabTrader;
 use types::{
-    Auth, BlockchainInfo, FatCrabMakerNotifDelegate, FatCrabTakerNotifDelegate, Network, RelayInfo,
+    Auth, BlockchainInfo, FatCrabMakerNotifDelegate, FatCrabTakerNotifDelegate, Network, RelayAddr,
+    RelayInfo, RelayInformationDocument, RelayStatus,
 };
