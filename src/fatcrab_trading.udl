@@ -210,6 +210,8 @@ interface FatCrabTrader {
     [Throws=FatCrabError]
     void remove_relay(string url);
     [Throws=FatCrabError]
+    void reconnect();
+    [Throws=FatCrabError]
     FatCrabBuyMaker new_buy_maker(FatCrabOrder order, string fatcrab_rx_addr);
     [Throws=FatCrabError]
     FatCrabSellMaker new_sell_maker(FatCrabOrder order);

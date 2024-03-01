@@ -146,6 +146,12 @@ impl FatCrabTrader {
             .map_err(|e| e.into())
     }
 
+    pub fn reconnect(&self) -> Result<(), FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.reconnect().await })
+            .map_err(|e| e.into())
+    }
+
     pub fn new_buy_maker(
         &self,
         order: FatCrabOrder,
