@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::str::FromStr;
 use std::sync::Arc;
@@ -215,6 +216,70 @@ impl FatCrabTrader {
             Ok(taker_access) => Ok(Arc::new(FatCrabSellTaker::new(taker_access))),
             Err(e) => Err(e.into()),
         }
+    }
+
+    pub fn get_buy_makers(&self) -> HashMap<String, Arc<FatCrabBuyMaker>> {
+        RUNTIME.block_on(async {
+            self.inner
+                .get_buy_makers()
+                .await
+                .into_iter()
+                .map(|(uuid, maker_access)| {
+                    (
+                        uuid.to_string(),
+                        Arc::new(FatCrabBuyMaker::new(maker_access)),
+                    )
+                })
+                .collect()
+        })
+    }
+
+    pub fn get_sell_makers(&self) -> HashMap<String, Arc<FatCrabSellMaker>> {
+        RUNTIME.block_on(async {
+            self.inner
+                .get_sell_makers()
+                .await
+                .into_iter()
+                .map(|(uuid, maker_access)| {
+                    (
+                        uuid.to_string(),
+                        Arc::new(FatCrabSellMaker::new(maker_access)),
+                    )
+                })
+                .collect()
+        })
+    }
+
+    pub fn get_buy_takers(&self) -> HashMap<String, Arc<FatCrabBuyTaker>> {
+        RUNTIME.block_on(async {
+            self.inner
+                .get_buy_takers()
+                .await
+                .into_iter()
+                .map(|(uuid, taker_access)| {
+                    (
+                        uuid.to_string(),
+                        Arc::new(FatCrabBuyTaker::new(taker_access)),
+                    )
+                })
+                .collect()
+        })
+    }
+
+    pub fn get_sell_takers(&self) -> HashMap<String, Arc<FatCrabSellTaker>> {
+        RUNTIME.block_on(async {
+            self.inner
+                .get_sell_takers()
+                .await
+                .into_iter()
+                .map(|(uuid, taker_access)| {
+                    (
+                        uuid.to_string(),
+                        Arc::new(FatCrabSellTaker::new(taker_access)),
+                    )
+                })
+                .collect()
+        })
     }
 
     pub fn shutdown(&self) -> Result<(), FatCrabError> {

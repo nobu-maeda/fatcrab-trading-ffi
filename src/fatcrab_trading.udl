@@ -221,6 +221,10 @@ interface FatCrabTrader {
     FatCrabBuyTaker new_buy_taker(FatCrabOrderEnvelope order_envelope);
     [Throws=FatCrabError]
     FatCrabSellTaker new_sell_taker(FatCrabOrderEnvelope order_envelope, string fatcrab_rx_addr);
+    record<string, FatCrabBuyMaker> get_buy_makers();
+    record<string, FatCrabSellMaker> get_sell_makers();
+    record<string, FatCrabBuyTaker> get_buy_takers();
+    record<string, FatCrabSellTaker> get_sell_takers();
     [Throws=FatCrabError]
     void shutdown();
 };
