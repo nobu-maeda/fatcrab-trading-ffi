@@ -4,6 +4,7 @@ use fatcrab_trading::maker::{FatCrabMakerAccess, FatCrabMakerNotif, MakerBuy, Ma
 use tokio::sync::mpsc;
 
 use crate::offer::FatCrabOfferEnvelope;
+use crate::order::FatCrabOrder;
 use crate::trade_rsp::FatCrabTradeRspType;
 use crate::types::FatCrabMakerNotifDelegate;
 use crate::{error::FatCrabError, RUNTIME};
@@ -26,6 +27,13 @@ impl FatCrabBuyMaker {
     pub fn post_new_order(&self) -> Result<(), FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.post_new_order().await })
+            .map_err(|e| e.into())
+    }
+
+    pub fn get_order_details(&self) -> Result<FatCrabOrder, FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.get_order_details().await })
+            .map(|order| order.into())
             .map_err(|e| e.into())
     }
 
@@ -96,6 +104,13 @@ impl FatCrabSellMaker {
     pub fn post_new_order(&self) -> Result<(), FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.post_new_order().await })
+            .map_err(|e| e.into())
+    }
+
+    pub fn get_order_details(&self) -> Result<FatCrabOrder, FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.get_order_details().await })
+            .map(|order| order.into())
             .map_err(|e| e.into())
     }
 

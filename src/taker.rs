@@ -3,6 +3,7 @@ use std::sync::Arc;
 use fatcrab_trading::taker::{FatCrabTakerAccess, FatCrabTakerNotif, TakerBuy, TakerSell};
 use tokio::sync::mpsc;
 
+use crate::order::FatCrabOrderEnvelope;
 use crate::types::FatCrabTakerNotifDelegate;
 use crate::{error::FatCrabError, RUNTIME};
 
@@ -24,6 +25,13 @@ impl FatCrabBuyTaker {
     pub fn take_order(&self) -> Result<(), FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.take_order().await })
+            .map_err(|e| e.into())
+    }
+
+    pub fn get_order_details(&self) -> Result<Arc<FatCrabOrderEnvelope>, FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.get_order_details().await })
+            .map(|order_envelope| Arc::new(order_envelope.into()))
             .map_err(|e| e.into())
     }
 
@@ -85,6 +93,13 @@ impl FatCrabSellTaker {
     pub fn take_order(&self) -> Result<(), FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.take_order().await })
+            .map_err(|e| e.into())
+    }
+
+    pub fn get_order_details(&self) -> Result<Arc<FatCrabOrderEnvelope>, FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.get_order_details().await })
+            .map(|order_envelope| Arc::new(order_envelope.into()))
             .map_err(|e| e.into())
     }
 
