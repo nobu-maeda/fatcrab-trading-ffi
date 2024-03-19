@@ -1,4 +1,4 @@
-use std::{path::PathBuf, sync::Arc};
+use std::path::PathBuf;
 
 use bitcoin::Network as InnerNetwork;
 use core_rpc::Auth as InnerAuth;
@@ -7,6 +7,10 @@ use fatcrab_trading::RelayInfo as InnerRelayInfo;
 use fatcrab_trading::RelayInformationDocument as InnerRelayInformationDocument;
 pub use fatcrab_trading::{maker::FatCrabMakerNotif, taker::FatCrabTakerNotif, RelayStatus};
 
+use crate::maker::FatCrabMakerNotifOfferStruct;
+use crate::maker::FatCrabMakerNotifPeerStruct;
+use crate::taker::FatCrabTakerNotifPeerStruct;
+use crate::taker::FatCrabTakerNotifTradeRspStruct;
 pub use crate::{
     offer::FatCrabOfferEnvelope, peer::FatCrabPeerEnvelope, trade_rsp::FatCrabTradeRspEnvelope,
 };
@@ -145,11 +149,11 @@ impl From<InnerRelayInfo> for RelayInfo {
 }
 
 pub trait FatCrabMakerNotifDelegate: Sync + Send {
-    fn on_maker_offer_notif(&self, offer_envelope: Arc<FatCrabOfferEnvelope>);
-    fn on_maker_peer_notif(&self, peer_envelope: Arc<FatCrabPeerEnvelope>);
+    fn on_maker_offer_notif(&self, offer_notif: FatCrabMakerNotifOfferStruct);
+    fn on_maker_peer_notif(&self, peer_notif: FatCrabMakerNotifPeerStruct);
 }
 
 pub trait FatCrabTakerNotifDelegate: Sync + Send {
-    fn on_taker_trade_rsp_notif(&self, trade_rsp_envelope: Arc<FatCrabTradeRspEnvelope>);
-    fn on_taker_peer_notif(&self, peer_envelope: Arc<FatCrabPeerEnvelope>);
+    fn on_taker_trade_rsp_notif(&self, trade_rsp_notif: FatCrabTakerNotifTradeRspStruct);
+    fn on_taker_peer_notif(&self, peer_notif: FatCrabTakerNotifPeerStruct);
 }

@@ -1,9 +1,16 @@
 use std::sync::Arc;
 
+pub use fatcrab_trading::taker::FatCrabTakerState;
 use fatcrab_trading::taker::{FatCrabTakerAccess, FatCrabTakerNotif, TakerBuy, TakerSell};
+use fatcrab_trading::taker::{
+    FatCrabTakerNotifPeerStruct as InnerTakerNotifPeerStruct,
+    FatCrabTakerNotifTradeRspStruct as InnerTakerNotifTradeRspStruct,
+};
 use tokio::sync::mpsc;
 
 use crate::order::FatCrabOrderEnvelope;
+use crate::peer::FatCrabPeerEnvelope;
+use crate::trade_rsp::FatCrabTradeRspEnvelope;
 use crate::types::FatCrabTakerNotifDelegate;
 use crate::{error::FatCrabError, RUNTIME};
 
@@ -22,7 +29,7 @@ impl FatCrabBuyTaker {
         Self { inner: taker }
     }
 
-    pub fn take_order(&self) -> Result<(), FatCrabError> {
+    pub fn take_order(&self) -> Result<FatCrabTakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.take_order().await })
             .map_err(|e| e.into())
@@ -35,7 +42,7 @@ impl FatCrabBuyTaker {
             .map_err(|e| e.into())
     }
 
-    pub fn notify_peer(&self, txid: String) -> Result<(), FatCrabError> {
+    pub fn notify_peer(&self, txid: String) -> Result<FatCrabTakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.notify_peer(txid).await })
             .map_err(|e| e.into())
@@ -47,7 +54,7 @@ impl FatCrabBuyTaker {
             .map_err(|e| e.into())
     }
 
-    pub fn trade_complete(&self) -> Result<(), FatCrabError> {
+    pub fn trade_complete(&self) -> Result<FatCrabTakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.trade_complete().await })
             .map_err(|e| e.into())
@@ -64,11 +71,11 @@ impl FatCrabBuyTaker {
         tokio::spawn(async move {
             while let Some(notif) = rx.recv().await {
                 match notif {
-                    FatCrabTakerNotif::TradeRsp(trade_rsp_envelope) => {
-                        delegate.on_taker_trade_rsp_notif(Arc::new(trade_rsp_envelope.into()));
+                    FatCrabTakerNotif::TradeRsp(trade_rsp_notif) => {
+                        delegate.on_taker_trade_rsp_notif(trade_rsp_notif.into());
                     }
-                    FatCrabTakerNotif::Peer(peer_envelope) => {
-                        delegate.on_taker_peer_notif(Arc::new(peer_envelope.into()));
+                    FatCrabTakerNotif::Peer(peer_notif) => {
+                        delegate.on_taker_peer_notif(peer_notif.into());
                     }
                 }
             }
@@ -90,7 +97,7 @@ impl FatCrabSellTaker {
         Self { inner: taker }
     }
 
-    pub fn take_order(&self) -> Result<(), FatCrabError> {
+    pub fn take_order(&self) -> Result<FatCrabTakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.take_order().await })
             .map_err(|e| e.into())
@@ -103,7 +110,7 @@ impl FatCrabSellTaker {
             .map_err(|e| e.into())
     }
 
-    pub fn trade_complete(&self) -> Result<(), FatCrabError> {
+    pub fn trade_complete(&self) -> Result<FatCrabTakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.trade_complete().await })
             .map_err(|e| e.into())
@@ -120,11 +127,11 @@ impl FatCrabSellTaker {
         tokio::spawn(async move {
             while let Some(notif) = rx.recv().await {
                 match notif {
-                    FatCrabTakerNotif::TradeRsp(trade_rsp_envelope) => {
-                        delegate.on_taker_trade_rsp_notif(Arc::new(trade_rsp_envelope.into()));
+                    FatCrabTakerNotif::TradeRsp(trade_rsp_notif) => {
+                        delegate.on_taker_trade_rsp_notif(trade_rsp_notif.into());
                     }
-                    FatCrabTakerNotif::Peer(peer_envelope) => {
-                        delegate.on_taker_peer_notif(Arc::new(peer_envelope.into()));
+                    FatCrabTakerNotif::Peer(peer_notif) => {
+                        delegate.on_taker_peer_notif(peer_notif.into());
                     }
                 }
             }
@@ -138,5 +145,51 @@ impl FatCrabSellTaker {
         RUNTIME
             .block_on(async { self.inner.unregister_notif_tx().await })
             .map_err(|e| e.into())
+    }
+}
+
+pub struct FatCrabTakerNotifTradeRspStruct {
+    pub state: FatCrabTakerState,
+    pub trade_rsp_envelope: Arc<FatCrabTradeRspEnvelope>,
+}
+
+impl From<InnerTakerNotifTradeRspStruct> for FatCrabTakerNotifTradeRspStruct {
+    fn from(trade_rsp_notif: InnerTakerNotifTradeRspStruct) -> Self {
+        Self {
+            state: trade_rsp_notif.state,
+            trade_rsp_envelope: Arc::new(trade_rsp_notif.trade_rsp_envelope.into()),
+        }
+    }
+}
+
+impl Into<InnerTakerNotifTradeRspStruct> for FatCrabTakerNotifTradeRspStruct {
+    fn into(self) -> InnerTakerNotifTradeRspStruct {
+        InnerTakerNotifTradeRspStruct {
+            state: self.state,
+            trade_rsp_envelope: self.trade_rsp_envelope.as_ref().clone().into(),
+        }
+    }
+}
+
+pub struct FatCrabTakerNotifPeerStruct {
+    pub state: FatCrabTakerState,
+    pub peer_envelope: Arc<FatCrabPeerEnvelope>,
+}
+
+impl From<InnerTakerNotifPeerStruct> for FatCrabTakerNotifPeerStruct {
+    fn from(peer_notif: InnerTakerNotifPeerStruct) -> Self {
+        Self {
+            state: peer_notif.state,
+            peer_envelope: Arc::new(peer_notif.peer_envelope.into()),
+        }
+    }
+}
+
+impl Into<InnerTakerNotifPeerStruct> for FatCrabTakerNotifPeerStruct {
+    fn into(self) -> InnerTakerNotifPeerStruct {
+        InnerTakerNotifPeerStruct {
+            state: self.state,
+            peer_envelope: self.peer_envelope.as_ref().clone().into(),
+        }
     }
 }

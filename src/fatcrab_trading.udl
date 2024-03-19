@@ -117,29 +117,60 @@ interface FatCrabPeerEnvelope {
   FatCrabPeerMessage message();
 };
 
+dictionary FatCrabMakerNotifOfferStruct {
+  FatCrabMakerState state;
+  FatCrabOfferEnvelope offer_envelope;
+};
+
+dictionary FatCrabMakerNotifPeerStruct {
+  FatCrabMakerState state;
+  FatCrabPeerEnvelope peer_envelope;
+};
+
 [Trait]
 interface FatCrabMakerNotifDelegate {
-  void on_maker_offer_notif(FatCrabOfferEnvelope offer_envelope);
-  void on_maker_peer_notif(FatCrabPeerEnvelope peer_envelope);
+  void on_maker_offer_notif(FatCrabMakerNotifOfferStruct offer_notif);
+  void on_maker_peer_notif(FatCrabMakerNotifPeerStruct peer_notif);
+};
+
+dictionary FatCrabTakerNotifTradeRspStruct {
+  FatCrabTakerState state;
+  FatCrabTradeRspEnvelope trade_rsp_envelope;
+};
+
+dictionary FatCrabTakerNotifPeerStruct {
+  FatCrabTakerState state;
+  FatCrabPeerEnvelope peer_envelope;
 };
 
 [Trait]
 interface FatCrabTakerNotifDelegate {
-  void on_taker_trade_rsp_notif(FatCrabTradeRspEnvelope trade_rsp_envelope);
-  void on_taker_peer_notif(FatCrabPeerEnvelope peer_envelope);
+  void on_taker_trade_rsp_notif(FatCrabTakerNotifTradeRspStruct trade_rsp_notif);
+  void on_taker_peer_notif(FatCrabTakerNotifPeerStruct peer_notif);
+};
+
+enum FatCrabMakerState {
+  "New",
+  "WaitingForOffers",
+  "ReceivedOffer",
+  "AcceptedOffer",
+  "InboundBtcNotified",
+  "InboundFcNotified",
+  "NotifiedOutbound",
+  "TradeCompleted",
 };
 
 interface FatCrabBuyMaker {
   [Throws=FatCrabError]
-  void post_new_order();
+  FatCrabMakerState post_new_order();
   [Throws=FatCrabError]
   FatCrabOrder get_order_details();
   [Throws=FatCrabError]
-  void trade_response(FatCrabTradeRspType trade_rsp_type, FatCrabOfferEnvelope offer_envelope);
+  FatCrabMakerState trade_response(FatCrabTradeRspType trade_rsp_type, FatCrabOfferEnvelope offer_envelope);
   [Throws=FatCrabError]
-  void release_notify_peer();
+  FatCrabMakerState release_notify_peer();
   [Throws=FatCrabError]
-  void trade_complete();
+  FatCrabMakerState trade_complete();
   [Throws=FatCrabError]
   void register_notif_delegate(FatCrabMakerNotifDelegate delegate);
   [Throws=FatCrabError]
@@ -148,34 +179,45 @@ interface FatCrabBuyMaker {
 
 interface FatCrabSellMaker {
   [Throws=FatCrabError]
-  void post_new_order();
+  FatCrabMakerState post_new_order();
   [Throws=FatCrabError]
   FatCrabOrder get_order_details();
   [Throws=FatCrabError]
-  void trade_response(FatCrabTradeRspType trade_rsp_type, FatCrabOfferEnvelope offer_envelope);
+  FatCrabMakerState trade_response(FatCrabTradeRspType trade_rsp_type, FatCrabOfferEnvelope offer_envelope);
   [Throws=FatCrabError]
   u32 check_btc_tx_confirmation();
   [Throws=FatCrabError]
-  void notify_peer(string fatcrab_txid);
+  FatCrabMakerState notify_peer(string fatcrab_txid);
   [Throws=FatCrabError]
-  void trade_complete();
+  FatCrabMakerState trade_complete();
   [Throws=FatCrabError]
   void register_notif_delegate(FatCrabMakerNotifDelegate delegate);
   [Throws=FatCrabError]
   void unregister_notif_delegate();
 };
 
+enum FatCrabTakerState {
+  "New",
+  "SubmittedOffer",
+  "OfferAccepted",
+  "OfferRejected",
+  "NotifiedOutbound",
+  "InboundBtcNotified",
+  "InboundFcNotified",
+  "TradeCompleted",
+};
+
 interface FatCrabBuyTaker {
   [Throws=FatCrabError]
-  void take_order();
+  FatCrabTakerState take_order();
   [Throws=FatCrabError]
   FatCrabOrderEnvelope get_order_details();
   [Throws=FatCrabError]
-  void notify_peer(string fatcrab_txid);
+  FatCrabTakerState notify_peer(string fatcrab_txid);
   [Throws=FatCrabError]
   u32 check_btc_tx_confirmation();
   [Throws=FatCrabError]
-  void trade_complete();
+  FatCrabTakerState trade_complete();
   [Throws=FatCrabError]
   void register_notif_delegate(FatCrabTakerNotifDelegate delegate);
   [Throws=FatCrabError]
@@ -184,11 +226,11 @@ interface FatCrabBuyTaker {
 
 interface FatCrabSellTaker {
   [Throws=FatCrabError]
-  void take_order();
+  FatCrabTakerState take_order();
   [Throws=FatCrabError]
   FatCrabOrderEnvelope get_order_details();
   [Throws=FatCrabError]
-  void trade_complete();
+  FatCrabTakerState trade_complete();
   [Throws=FatCrabError]
   void register_notif_delegate(FatCrabTakerNotifDelegate delegate);
   [Throws=FatCrabError]

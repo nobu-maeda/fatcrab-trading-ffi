@@ -14,11 +14,17 @@ uniffi::include_scaffolding!("fatcrab_trading");
 static RUNTIME: Lazy<Runtime> = Lazy::new(|| Runtime::new().expect("Can't start Tokio runtime"));
 
 use error::FatCrabError;
-use maker::{FatCrabBuyMaker, FatCrabSellMaker};
+use maker::{
+    FatCrabBuyMaker, FatCrabMakerNotifOfferStruct, FatCrabMakerNotifPeerStruct, FatCrabMakerState,
+    FatCrabSellMaker,
+};
 use offer::FatCrabOfferEnvelope;
 use order::{FatCrabOrder, FatCrabOrderEnvelope, FatCrabOrderType};
 use peer::{FatCrabPeerEnvelope, FatCrabPeerMessage};
-use taker::{FatCrabBuyTaker, FatCrabSellTaker};
+use taker::{
+    FatCrabBuyTaker, FatCrabSellTaker, FatCrabTakerNotifPeerStruct,
+    FatCrabTakerNotifTradeRspStruct, FatCrabTakerState,
+};
 use trade_rsp::{FatCrabTradeRsp, FatCrabTradeRspEnvelope, FatCrabTradeRspType};
 use trader::FatCrabTrader;
 use types::{

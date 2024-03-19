@@ -1,10 +1,16 @@
 use std::sync::Arc;
 
+pub use fatcrab_trading::maker::FatCrabMakerState;
 use fatcrab_trading::maker::{FatCrabMakerAccess, FatCrabMakerNotif, MakerBuy, MakerSell};
+use fatcrab_trading::maker::{
+    FatCrabMakerNotifOfferStruct as InnerMakerNotifOfferStruct,
+    FatCrabMakerNotifPeerStruct as InnerMakerNotifPeerStruct,
+};
 use tokio::sync::mpsc;
 
 use crate::offer::FatCrabOfferEnvelope;
 use crate::order::FatCrabOrder;
+use crate::peer::FatCrabPeerEnvelope;
 use crate::trade_rsp::FatCrabTradeRspType;
 use crate::types::FatCrabMakerNotifDelegate;
 use crate::{error::FatCrabError, RUNTIME};
@@ -24,7 +30,7 @@ impl FatCrabBuyMaker {
         Self { inner: maker }
     }
 
-    pub fn post_new_order(&self) -> Result<(), FatCrabError> {
+    pub fn post_new_order(&self) -> Result<FatCrabMakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.post_new_order().await })
             .map_err(|e| e.into())
@@ -41,7 +47,7 @@ impl FatCrabBuyMaker {
         &self,
         trade_rsp_type: FatCrabTradeRspType,
         offer_envelope: Arc<FatCrabOfferEnvelope>,
-    ) -> Result<(), FatCrabError> {
+    ) -> Result<FatCrabMakerState, FatCrabError> {
         let offer_envelope = offer_envelope.as_ref().clone();
         RUNTIME
             .block_on(async {
@@ -52,13 +58,13 @@ impl FatCrabBuyMaker {
             .map_err(|e| e.into())
     }
 
-    pub fn release_notify_peer(&self) -> Result<(), FatCrabError> {
+    pub fn release_notify_peer(&self) -> Result<FatCrabMakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.release_notify_peer().await })
             .map_err(|e| e.into())
     }
 
-    pub fn trade_complete(&self) -> Result<(), FatCrabError> {
+    pub fn trade_complete(&self) -> Result<FatCrabMakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.trade_complete().await })
             .map_err(|e| e.into())
@@ -75,11 +81,11 @@ impl FatCrabBuyMaker {
         tokio::spawn(async move {
             while let Some(notif) = rx.recv().await {
                 match notif {
-                    FatCrabMakerNotif::Offer(offer_envelope) => {
-                        delegate.on_maker_offer_notif(Arc::new(offer_envelope.into()));
+                    FatCrabMakerNotif::Offer(offer_notif) => {
+                        delegate.on_maker_offer_notif(offer_notif.into());
                     }
-                    FatCrabMakerNotif::Peer(peer_envelope) => {
-                        delegate.on_maker_peer_notif(Arc::new(peer_envelope.into()));
+                    FatCrabMakerNotif::Peer(peer_notif) => {
+                        delegate.on_maker_peer_notif(peer_notif.into());
                     }
                 }
             }
@@ -101,7 +107,7 @@ impl FatCrabSellMaker {
         Self { inner: maker }
     }
 
-    pub fn post_new_order(&self) -> Result<(), FatCrabError> {
+    pub fn post_new_order(&self) -> Result<FatCrabMakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.post_new_order().await })
             .map_err(|e| e.into())
@@ -118,7 +124,7 @@ impl FatCrabSellMaker {
         &self,
         trade_rsp_type: FatCrabTradeRspType,
         offer_envelope: Arc<FatCrabOfferEnvelope>,
-    ) -> Result<(), FatCrabError> {
+    ) -> Result<FatCrabMakerState, FatCrabError> {
         let offer_envelope = offer_envelope.as_ref().clone();
         RUNTIME
             .block_on(async {
@@ -135,13 +141,13 @@ impl FatCrabSellMaker {
             .map_err(|e| e.into())
     }
 
-    pub fn notify_peer(&self, fatcrab_txid: String) -> Result<(), FatCrabError> {
+    pub fn notify_peer(&self, fatcrab_txid: String) -> Result<FatCrabMakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.notify_peer(fatcrab_txid).await })
             .map_err(|e| e.into())
     }
 
-    pub fn trade_complete(&self) -> Result<(), FatCrabError> {
+    pub fn trade_complete(&self) -> Result<FatCrabMakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.trade_complete().await })
             .map_err(|e| e.into())
@@ -158,11 +164,11 @@ impl FatCrabSellMaker {
         tokio::spawn(async move {
             while let Some(notif) = rx.recv().await {
                 match notif {
-                    FatCrabMakerNotif::Offer(offer_envelope) => {
-                        delegate.on_maker_offer_notif(Arc::new(offer_envelope.into()));
+                    FatCrabMakerNotif::Offer(offer_notif) => {
+                        delegate.on_maker_offer_notif(offer_notif.into());
                     }
-                    FatCrabMakerNotif::Peer(peer_envelope) => {
-                        delegate.on_maker_peer_notif(Arc::new(peer_envelope.into()));
+                    FatCrabMakerNotif::Peer(peer_notif) => {
+                        delegate.on_maker_peer_notif(peer_notif.into());
                     }
                 }
             }
@@ -176,5 +182,51 @@ impl FatCrabSellMaker {
         RUNTIME
             .block_on(async { self.inner.unregister_notif_tx().await })
             .map_err(|e| e.into())
+    }
+}
+
+pub struct FatCrabMakerNotifOfferStruct {
+    pub state: FatCrabMakerState,
+    pub offer_envelope: Arc<FatCrabOfferEnvelope>,
+}
+
+impl From<InnerMakerNotifOfferStruct> for FatCrabMakerNotifOfferStruct {
+    fn from(offer_notif: InnerMakerNotifOfferStruct) -> Self {
+        Self {
+            state: offer_notif.state,
+            offer_envelope: Arc::new(offer_notif.offer_envelope.into()),
+        }
+    }
+}
+
+impl Into<InnerMakerNotifOfferStruct> for FatCrabMakerNotifOfferStruct {
+    fn into(self) -> InnerMakerNotifOfferStruct {
+        InnerMakerNotifOfferStruct {
+            state: self.state,
+            offer_envelope: self.offer_envelope.as_ref().clone().into(),
+        }
+    }
+}
+
+pub struct FatCrabMakerNotifPeerStruct {
+    pub state: FatCrabMakerState,
+    pub peer_envelope: Arc<FatCrabPeerEnvelope>,
+}
+
+impl From<InnerMakerNotifPeerStruct> for FatCrabMakerNotifPeerStruct {
+    fn from(peer_notif: InnerMakerNotifPeerStruct) -> Self {
+        Self {
+            state: peer_notif.state,
+            peer_envelope: Arc::new(peer_notif.peer_envelope.into()),
+        }
+    }
+}
+
+impl Into<InnerMakerNotifPeerStruct> for FatCrabMakerNotifPeerStruct {
+    fn into(self) -> InnerMakerNotifPeerStruct {
+        InnerMakerNotifPeerStruct {
+            state: self.state,
+            peer_envelope: self.peer_envelope.as_ref().clone().into(),
+        }
     }
 }
