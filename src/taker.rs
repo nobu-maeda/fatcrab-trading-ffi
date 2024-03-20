@@ -42,6 +42,12 @@ impl FatCrabBuyTaker {
             .map_err(|e| e.into())
     }
 
+    pub fn get_state(&self) -> Result<FatCrabTakerState, FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.get_state().await })
+            .map_err(|e| e.into())
+    }
+
     pub fn notify_peer(&self, txid: String) -> Result<FatCrabTakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.notify_peer(txid).await })
@@ -107,6 +113,12 @@ impl FatCrabSellTaker {
         RUNTIME
             .block_on(async { self.inner.get_order_details().await })
             .map(|order_envelope| Arc::new(order_envelope.into()))
+            .map_err(|e| e.into())
+    }
+
+    pub fn get_state(&self) -> Result<FatCrabTakerState, FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.get_state().await })
             .map_err(|e| e.into())
     }
 

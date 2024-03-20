@@ -166,6 +166,8 @@ interface FatCrabBuyMaker {
   [Throws=FatCrabError]
   FatCrabOrder get_order_details();
   [Throws=FatCrabError]
+  FatCrabMakerState get_state();
+  [Throws=FatCrabError]
   FatCrabMakerState trade_response(FatCrabTradeRspType trade_rsp_type, FatCrabOfferEnvelope offer_envelope);
   [Throws=FatCrabError]
   FatCrabMakerState release_notify_peer();
@@ -182,6 +184,8 @@ interface FatCrabSellMaker {
   FatCrabMakerState post_new_order();
   [Throws=FatCrabError]
   FatCrabOrder get_order_details();
+  [Throws=FatCrabError]
+  FatCrabMakerState get_state();
   [Throws=FatCrabError]
   FatCrabMakerState trade_response(FatCrabTradeRspType trade_rsp_type, FatCrabOfferEnvelope offer_envelope);
   [Throws=FatCrabError]
@@ -213,6 +217,8 @@ interface FatCrabBuyTaker {
   [Throws=FatCrabError]
   FatCrabOrderEnvelope get_order_details();
   [Throws=FatCrabError]
+  FatCrabTakerState get_state();
+  [Throws=FatCrabError]
   FatCrabTakerState notify_peer(string fatcrab_txid);
   [Throws=FatCrabError]
   u32 check_btc_tx_confirmation();
@@ -229,6 +235,8 @@ interface FatCrabSellTaker {
   FatCrabTakerState take_order();
   [Throws=FatCrabError]
   FatCrabOrderEnvelope get_order_details();
+  [Throws=FatCrabError]
+  FatCrabTakerState get_state();
   [Throws=FatCrabError]
   FatCrabTakerState trade_complete();
   [Throws=FatCrabError]

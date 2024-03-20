@@ -43,6 +43,12 @@ impl FatCrabBuyMaker {
             .map_err(|e| e.into())
     }
 
+    pub fn get_state(&self) -> Result<FatCrabMakerState, FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.get_state().await })
+            .map_err(|e| e.into())
+    }
+
     pub fn trade_response(
         &self,
         trade_rsp_type: FatCrabTradeRspType,
@@ -117,6 +123,12 @@ impl FatCrabSellMaker {
         RUNTIME
             .block_on(async { self.inner.get_order_details().await })
             .map(|order| order.into())
+            .map_err(|e| e.into())
+    }
+
+    pub fn get_state(&self) -> Result<FatCrabMakerState, FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.get_state().await })
             .map_err(|e| e.into())
     }
 
