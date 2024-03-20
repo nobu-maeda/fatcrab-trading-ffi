@@ -48,6 +48,16 @@ impl FatCrabBuyTaker {
             .map_err(|e| e.into())
     }
 
+    pub fn query_trade_rsp(&self) -> Result<Option<Arc<FatCrabTradeRspEnvelope>>, FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.query_trade_rsp().await })
+            .map(|trade_rsp| match trade_rsp {
+                Some(trade_rsp) => Some(Arc::new(trade_rsp.into())),
+                None => None,
+            })
+            .map_err(|e| e.into())
+    }
+
     pub fn notify_peer(&self, txid: String) -> Result<FatCrabTakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.notify_peer(txid).await })

@@ -49,6 +49,40 @@ impl FatCrabBuyMaker {
             .map_err(|e| e.into())
     }
 
+    pub fn query_offers(&self) -> Result<Vec<Arc<FatCrabOfferEnvelope>>, FatCrabError> {
+        RUNTIME
+            .block_on(async {
+                match self.inner.query_offers().await {
+                    Ok(offers) => {
+                        let offer_envelopes: Vec<Arc<FatCrabOfferEnvelope>> = offers
+                            .iter()
+                            .map(|o| Arc::new(o.to_owned().into()))
+                            .collect();
+                        return Ok(offer_envelopes);
+                    }
+                    Err(e) => return Err(e),
+                }
+            })
+            .map_err(|e| e.into())
+    }
+
+    pub fn query_peer_msg(&self) -> Result<Option<Arc<FatCrabPeerEnvelope>>, FatCrabError> {
+        RUNTIME
+            .block_on(async {
+                match self.inner.query_peer_msg().await {
+                    Ok(peer_msg) => {
+                        if let Some(msg) = peer_msg {
+                            return Ok(Some(Arc::new(msg.into())));
+                        } else {
+                            return Ok(None);
+                        }
+                    }
+                    Err(e) => return Err(e),
+                }
+            })
+            .map_err(|e| e.into())
+    }
+
     pub fn trade_response(
         &self,
         trade_rsp_type: FatCrabTradeRspType,
@@ -129,6 +163,40 @@ impl FatCrabSellMaker {
     pub fn get_state(&self) -> Result<FatCrabMakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.get_state().await })
+            .map_err(|e| e.into())
+    }
+
+    pub fn query_offers(&self) -> Result<Vec<Arc<FatCrabOfferEnvelope>>, FatCrabError> {
+        RUNTIME
+            .block_on(async {
+                match self.inner.query_offers().await {
+                    Ok(offers) => {
+                        let offer_envelopes: Vec<Arc<FatCrabOfferEnvelope>> = offers
+                            .iter()
+                            .map(|o| Arc::new(o.to_owned().into()))
+                            .collect();
+                        return Ok(offer_envelopes);
+                    }
+                    Err(e) => return Err(e),
+                }
+            })
+            .map_err(|e| e.into())
+    }
+
+    pub fn query_peer_msg(&self) -> Result<Option<Arc<FatCrabPeerEnvelope>>, FatCrabError> {
+        RUNTIME
+            .block_on(async {
+                match self.inner.query_peer_msg().await {
+                    Ok(peer_msg) => {
+                        if let Some(msg) = peer_msg {
+                            return Ok(Some(Arc::new(msg.into())));
+                        } else {
+                            return Ok(None);
+                        }
+                    }
+                    Err(e) => return Err(e),
+                }
+            })
             .map_err(|e| e.into())
     }
 

@@ -168,6 +168,10 @@ interface FatCrabBuyMaker {
   [Throws=FatCrabError]
   FatCrabMakerState get_state();
   [Throws=FatCrabError]
+  sequence<FatCrabOfferEnvelope> query_offers();
+  [Throws=FatCrabError]
+  FatCrabPeerEnvelope? query_peer_msg();
+  [Throws=FatCrabError]
   FatCrabMakerState trade_response(FatCrabTradeRspType trade_rsp_type, FatCrabOfferEnvelope offer_envelope);
   [Throws=FatCrabError]
   FatCrabMakerState release_notify_peer();
@@ -186,6 +190,10 @@ interface FatCrabSellMaker {
   FatCrabOrder get_order_details();
   [Throws=FatCrabError]
   FatCrabMakerState get_state();
+  [Throws=FatCrabError]
+  sequence<FatCrabOfferEnvelope> query_offers();
+  [Throws=FatCrabError]
+  FatCrabPeerEnvelope? query_peer_msg();
   [Throws=FatCrabError]
   FatCrabMakerState trade_response(FatCrabTradeRspType trade_rsp_type, FatCrabOfferEnvelope offer_envelope);
   [Throws=FatCrabError]
@@ -218,6 +226,8 @@ interface FatCrabBuyTaker {
   FatCrabOrderEnvelope get_order_details();
   [Throws=FatCrabError]
   FatCrabTakerState get_state();
+  [Throws=FatCrabError]
+  FatCrabTradeRspEnvelope? query_trade_rsp();
   [Throws=FatCrabError]
   FatCrabTakerState notify_peer(string fatcrab_txid);
   [Throws=FatCrabError]
