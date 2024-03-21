@@ -103,10 +103,11 @@ dictionary FatCrabPeerMessage {
 
 interface FatCrabOrderEnvelope {
   FatCrabOrder order();
+  string pubkey();
 };
 
 interface FatCrabOfferEnvelope {
-
+  string pubkey();
 };
 
 interface FatCrabTradeRspEnvelope {

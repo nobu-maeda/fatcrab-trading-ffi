@@ -22,6 +22,9 @@ impl Into<InnerEnvelope> for FatCrabOrderEnvelope {
 }
 
 impl FatCrabOrderEnvelope {
+    pub fn pubkey(&self) -> String {
+        self.inner.pubkey.to_owned()
+    }
     pub fn order(&self) -> FatCrabOrder {
         self.inner.order.clone().into()
     }

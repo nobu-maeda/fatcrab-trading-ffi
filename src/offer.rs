@@ -16,3 +16,9 @@ impl Into<InnerEnvelope> for FatCrabOfferEnvelope {
         self.inner
     }
 }
+
+impl FatCrabOfferEnvelope {
+    pub fn pubkey(&self) -> String {
+        self.inner.pubkey.to_owned()
+    }
+}
