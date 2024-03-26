@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use std::thread::spawn;
 
 pub use fatcrab_trading::taker::FatCrabTakerState;
 use fatcrab_trading::taker::{FatCrabTakerAccess, FatCrabTakerNotif, TakerBuy, TakerSell};
@@ -83,19 +84,22 @@ impl FatCrabBuyTaker {
         RUNTIME.block_on(async {
             _ = self.inner.unregister_notif_tx().await;
         });
+
         let (tx, mut rx) = mpsc::channel(TAKER_NOTIF_CHANNEL_SIZE);
-        tokio::spawn(async move {
-            while let Some(notif) = rx.recv().await {
-                match notif {
+        spawn(move || loop {
+            match rx.blocking_recv() {
+                Some(notif) => match notif {
                     FatCrabTakerNotif::TradeRsp(trade_rsp_notif) => {
                         delegate.on_taker_trade_rsp_notif(trade_rsp_notif.into());
                     }
                     FatCrabTakerNotif::Peer(peer_notif) => {
                         delegate.on_taker_peer_notif(peer_notif.into());
                     }
-                }
+                },
+                None => break,
             }
         });
+
         RUNTIME
             .block_on(async { self.inner.register_notif_tx(tx).await })
             .map_err(|e| e.into())
@@ -145,19 +149,22 @@ impl FatCrabSellTaker {
         RUNTIME.block_on(async {
             _ = self.inner.unregister_notif_tx().await;
         });
+
         let (tx, mut rx) = mpsc::channel(TAKER_NOTIF_CHANNEL_SIZE);
-        tokio::spawn(async move {
-            while let Some(notif) = rx.recv().await {
-                match notif {
+        spawn(move || loop {
+            match rx.blocking_recv() {
+                Some(notif) => match notif {
                     FatCrabTakerNotif::TradeRsp(trade_rsp_notif) => {
                         delegate.on_taker_trade_rsp_notif(trade_rsp_notif.into());
                     }
                     FatCrabTakerNotif::Peer(peer_notif) => {
                         delegate.on_taker_peer_notif(peer_notif.into());
                     }
-                }
+                },
+                None => break,
             }
         });
+
         RUNTIME
             .block_on(async { self.inner.register_notif_tx(tx).await })
             .map_err(|e| e.into())

@@ -16,14 +16,14 @@ path = "uniffi-bindgen.rs"
 bip39 = "2.0"
 bitcoin = "0.30"
 core-rpc = "0.17"
+fatcrab-trading = { git = "https://github.com/nobu-maeda/fatcrab-trading" }
+once_cell = "1.19"
 secp256k1 = "0.27"
 thiserror = "1.0.50"
 url = "2.0"
 uuid = { version = "1.4", features = ["v4"] }
-
-fatcrab-trading = { git = "https://github.com/nobu-maeda/fatcrab-trading" }
-uniffi = { version = "0.25.2", features = ["cli"] }
-tokio = { version = "1.34", features = ["macros", "sync", "rt"] }
+uniffi = { version = "0.26.1", features = ["cli"] }
+tokio = { version = "1.36", features = ["macros", "sync", "rt"] }
 
 [build-dependencies]
-uniffi = { version = "0.25.2", features = ["build"] }
+uniffi = { version = "0.26.1", features = ["build"] }
