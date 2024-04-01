@@ -170,6 +170,12 @@ impl FatCrabSellMaker {
             .map_err(|e| e.into())
     }
 
+    pub fn get_peer_btc_txid(&self) -> Result<Option<String>, FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.get_peer_btc_txid().await })
+            .map_err(|e| e.into())
+    }
+
     pub fn query_offers(&self) -> Result<Vec<Arc<FatCrabOfferEnvelope>>, FatCrabError> {
         RUNTIME
             .block_on(async {
