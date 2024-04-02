@@ -7,6 +7,7 @@ use bitcoin::{Address, Network};
 use fatcrab_trading::order::FatCrabOrderType;
 use secp256k1::SecretKey;
 
+pub use fatcrab_trading::common::Balances;
 use fatcrab_trading::trader::FatCrabTrader as InnerTrader;
 use url::Url;
 
@@ -65,15 +66,9 @@ impl FatCrabTrader {
         }
     }
 
-    pub fn wallet_spendable_balance(&self) -> Result<u64, FatCrabError> {
+    pub fn wallet_balances(&self) -> Result<Balances, FatCrabError> {
         RUNTIME
-            .block_on(async { self.inner.wallet_spendable_balance().await })
-            .map_err(|e| e.into())
-    }
-
-    pub fn wallet_allocated_amount(&self) -> Result<u64, FatCrabError> {
-        RUNTIME
-            .block_on(async { self.inner.wallet_allocated_amount().await })
+            .block_on(async { self.inner.wallet_balances().await })
             .map_err(|e| e.into())
     }
 
