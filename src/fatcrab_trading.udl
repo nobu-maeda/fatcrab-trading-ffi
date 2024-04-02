@@ -1,4 +1,6 @@
-namespace FatCrabTrading {};
+namespace FatCrabTrading {
+  void init_tracing_for_oslog();
+};
 
 [Error]
 interface FatCrabError {
@@ -34,6 +36,14 @@ enum Network {
 interface BlockchainInfo {
   Electrum(string url, Network network);
   Rpc(string url, Auth auth, Network network);
+};
+
+dictionary Balances {
+  u64 immature;
+  u64 trusted_pending;
+  u64 untrusted_pending;
+  u64 confirmed;
+  u64 allocated;
 };
 
 dictionary RelayAddr {
@@ -267,9 +277,7 @@ interface FatCrabTrader {
     [Throws=FatCrabError]
     string wallet_bip39_mnemonic();
     [Throws=FatCrabError]
-    u64 wallet_spendable_balance();
-    [Throws=FatCrabError]
-    u64 wallet_allocated_amount();
+    Balances wallet_balances();
     [Throws=FatCrabError]
     string wallet_generate_receive_address();
     [Throws=FatCrabError]

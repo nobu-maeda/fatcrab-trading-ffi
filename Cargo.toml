@@ -20,6 +20,9 @@ fatcrab-trading = { git = "https://github.com/nobu-maeda/fatcrab-trading" }
 once_cell = "1.19"
 secp256k1 = "0.27"
 thiserror = "1.0.50"
+tracing = "0.1.40"
+tracing-oslog = { git = "https://github.com/Absolucy/tracing-oslog", branch = "main" }
+tracing-subscriber = "0.3.18"
 url = "2.0"
 uuid = { version = "1.4", features = ["v4"] }
 uniffi = { version = "0.26.1", features = ["cli"] }
