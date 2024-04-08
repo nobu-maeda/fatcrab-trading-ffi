@@ -15,6 +15,26 @@ pub use crate::{
     offer::FatCrabOfferEnvelope, peer::FatCrabPeerEnvelope, trade_rsp::FatCrabTradeRspEnvelope,
 };
 
+pub enum FilterLevel {
+    Error,
+    Warn,
+    Info,
+    Debug,
+    Trace,
+}
+
+impl From<FilterLevel> for tracing_subscriber::filter::LevelFilter {
+    fn from(level: FilterLevel) -> Self {
+        match level {
+            FilterLevel::Error => tracing_subscriber::filter::LevelFilter::ERROR,
+            FilterLevel::Warn => tracing_subscriber::filter::LevelFilter::WARN,
+            FilterLevel::Info => tracing_subscriber::filter::LevelFilter::INFO,
+            FilterLevel::Debug => tracing_subscriber::filter::LevelFilter::DEBUG,
+            FilterLevel::Trace => tracing_subscriber::filter::LevelFilter::TRACE,
+        }
+    }
+}
+
 pub enum Auth {
     None,
     UserPass { username: String, password: String },

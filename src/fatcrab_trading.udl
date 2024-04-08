@@ -1,5 +1,5 @@
 namespace FatCrabTrading {
-  void init_tracing_for_oslog();
+  void init_tracing_for_oslog(FilterLevel level);
 };
 
 [Error]
@@ -16,6 +16,15 @@ interface FatCrabError {
   UrlParse(string description);
   MpscSend(string description);
   OneshotRecv(string description);
+};
+
+[Enum]
+enum FilterLevel {
+  "Trace",
+  "Debug",
+  "Info",
+  "Warn",
+  "Error",
 };
 
 [Enum]
