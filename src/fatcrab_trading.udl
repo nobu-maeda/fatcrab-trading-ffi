@@ -188,6 +188,8 @@ interface FatCrabBuyMaker {
   [Throws=FatCrabError]
   FatCrabMakerState get_state();
   [Throws=FatCrabError]
+  string? get_peer_pubkey();
+  [Throws=FatCrabError]
   sequence<FatCrabOfferEnvelope> query_offers();
   [Throws=FatCrabError]
   FatCrabPeerEnvelope? query_peer_msg();
@@ -210,6 +212,8 @@ interface FatCrabSellMaker {
   FatCrabOrder get_order_details();
   [Throws=FatCrabError]
   FatCrabMakerState get_state();
+  [Throws=FatCrabError]
+  string? get_peer_pubkey();
   [Throws=FatCrabError]
   string? get_peer_btc_txid();
   [Throws=FatCrabError]

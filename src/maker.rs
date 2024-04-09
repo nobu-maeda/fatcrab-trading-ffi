@@ -50,6 +50,12 @@ impl FatCrabBuyMaker {
             .map_err(|e| e.into())
     }
 
+    pub fn get_peer_pubkey(&self) -> Result<Option<String>, FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.get_peer_pubkey().await })
+            .map_err(|e| e.into())
+    }
+
     pub fn query_offers(&self) -> Result<Vec<Arc<FatCrabOfferEnvelope>>, FatCrabError> {
         RUNTIME
             .block_on(async {
@@ -167,6 +173,12 @@ impl FatCrabSellMaker {
     pub fn get_state(&self) -> Result<FatCrabMakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.get_state().await })
+            .map_err(|e| e.into())
+    }
+
+    pub fn get_peer_pubkey(&self) -> Result<Option<String>, FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.get_peer_pubkey().await })
             .map_err(|e| e.into())
     }
 
