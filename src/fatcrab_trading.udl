@@ -1,5 +1,5 @@
 namespace FatCrabTrading {
-  void init_tracing_for_oslog(FilterLevel level);
+  void init_tracing_for_oslog(FilterLevel level, boolean log_timestamp, boolean log_level);
 };
 
 [Error]

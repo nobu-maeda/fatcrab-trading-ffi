@@ -37,9 +37,13 @@ use types::{
 };
 
 // Init tracing for Apple unified logging system
-pub fn init_tracing_for_oslog(level: FilterLevel) {
+pub fn init_tracing_for_oslog(level: FilterLevel, log_timestamp: bool, log_level: bool) {
     let level_filter: LevelFilter = level.into();
-    let collector = tracing_subscriber::registry()
-        .with(OsLogger::new("dev.n3xb.io.fatcrab-trading", "default").with_filter(level_filter));
+    let collector = tracing_subscriber::registry().with(
+        OsLogger::new("dev.n3xb.io.fatcrab-trading", "default")
+            .log_timestamp(log_timestamp)
+            .log_level(log_level)
+            .with_filter(level_filter),
+    );
     tracing::subscriber::set_global_default(collector).expect("failed to set global subscriber");
 }
