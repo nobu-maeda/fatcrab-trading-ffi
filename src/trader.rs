@@ -95,6 +95,12 @@ impl FatCrabTrader {
         }
     }
 
+    pub fn wallet_blockchain_height(&self) -> Result<u32, FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.wallet_blockchain_height().await })
+            .map_err(|e| e.into())
+    }
+
     pub fn wallet_blockchain_sync(&self) -> Result<(), FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.wallet_blockchain_sync().await })

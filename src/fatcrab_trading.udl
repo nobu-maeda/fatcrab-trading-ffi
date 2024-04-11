@@ -296,6 +296,8 @@ interface FatCrabTrader {
     [Throws=FatCrabError]
     string wallet_send_to_address(string address, u64 amount);
     [Throws=FatCrabError]
+    u32 wallet_blockchain_height();
+    [Throws=FatCrabError]
     void wallet_blockchain_sync();
     string nostr_pubkey();
     [Throws=FatCrabError]
