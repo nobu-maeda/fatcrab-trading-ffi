@@ -90,6 +90,12 @@ impl FatCrabBuyMaker {
             .map_err(|e| e.into())
     }
 
+    pub fn cancel_order(&self) -> Result<(), FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.cancel_order().await })
+            .map_err(|e| e.into())
+    }
+
     pub fn trade_response(
         &self,
         trade_rsp_type: FatCrabTradeRspType,
@@ -219,6 +225,12 @@ impl FatCrabSellMaker {
                     Err(e) => return Err(e),
                 }
             })
+            .map_err(|e| e.into())
+    }
+
+    pub fn cancel_order(&self) -> Result<(), FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.cancel_order().await })
             .map_err(|e| e.into())
     }
 
