@@ -65,6 +65,23 @@ impl FatCrabBuyTaker {
             .map_err(|e| e.into())
     }
 
+    pub fn query_peer_msg(&self) -> Result<Option<Arc<FatCrabPeerEnvelope>>, FatCrabError> {
+        RUNTIME
+            .block_on(async {
+                match self.inner.query_peer_msg().await {
+                    Ok(peer_msg) => {
+                        if let Some(msg) = peer_msg {
+                            return Ok(Some(Arc::new(msg.into())));
+                        } else {
+                            return Ok(None);
+                        }
+                    }
+                    Err(e) => return Err(e),
+                }
+            })
+            .map_err(|e| e.into())
+    }
+
     pub fn notify_peer(&self, txid: String) -> Result<FatCrabTakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.notify_peer(txid).await })
@@ -139,6 +156,29 @@ impl FatCrabSellTaker {
     pub fn get_state(&self) -> Result<FatCrabTakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.get_state().await })
+            .map_err(|e| e.into())
+    }
+
+    pub fn query_peer_msg(&self) -> Result<Option<Arc<FatCrabPeerEnvelope>>, FatCrabError> {
+        RUNTIME
+            .block_on(async {
+                match self.inner.query_peer_msg().await {
+                    Ok(peer_msg) => {
+                        if let Some(msg) = peer_msg {
+                            return Ok(Some(Arc::new(msg.into())));
+                        } else {
+                            return Ok(None);
+                        }
+                    }
+                    Err(e) => return Err(e),
+                }
+            })
+            .map_err(|e| e.into())
+    }
+
+    pub fn release_notify_peer(&self) -> Result<FatCrabTakerState, FatCrabError> {
+        RUNTIME
+            .block_on(async { self.inner.release_notify_peer().await })
             .map_err(|e| e.into())
     }
 
