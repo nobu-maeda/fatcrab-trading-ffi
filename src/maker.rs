@@ -90,7 +90,7 @@ impl FatCrabBuyMaker {
             .map_err(|e| e.into())
     }
 
-    pub fn cancel_order(&self) -> Result<(), FatCrabError> {
+    pub fn cancel_order(&self) -> Result<FatCrabMakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.cancel_order().await })
             .map_err(|e| e.into())
@@ -228,7 +228,7 @@ impl FatCrabSellMaker {
             .map_err(|e| e.into())
     }
 
-    pub fn cancel_order(&self) -> Result<(), FatCrabError> {
+    pub fn cancel_order(&self) -> Result<FatCrabMakerState, FatCrabError> {
         RUNTIME
             .block_on(async { self.inner.cancel_order().await })
             .map_err(|e| e.into())

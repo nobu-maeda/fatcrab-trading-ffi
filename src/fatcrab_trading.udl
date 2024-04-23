@@ -178,6 +178,7 @@ enum FatCrabMakerState {
   "InboundFcNotified",
   "NotifiedOutbound",
   "TradeCompleted",
+  "TradeCancelled",
 };
 
 interface FatCrabBuyMaker {
@@ -194,7 +195,7 @@ interface FatCrabBuyMaker {
   [Throws=FatCrabError]
   FatCrabPeerEnvelope? query_peer_msg();
   [Throws=FatCrabError]
-  void cancel_order();
+  FatCrabMakerState cancel_order();
   [Throws=FatCrabError]
   FatCrabMakerState trade_response(FatCrabTradeRspType trade_rsp_type, FatCrabOfferEnvelope offer_envelope);
   [Throws=FatCrabError]
@@ -223,7 +224,7 @@ interface FatCrabSellMaker {
   [Throws=FatCrabError]
   FatCrabPeerEnvelope? query_peer_msg();
   [Throws=FatCrabError]
-  void cancel_order();
+  FatCrabMakerState cancel_order();
   [Throws=FatCrabError]
   FatCrabMakerState trade_response(FatCrabTradeRspType trade_rsp_type, FatCrabOfferEnvelope offer_envelope);
   [Throws=FatCrabError]
