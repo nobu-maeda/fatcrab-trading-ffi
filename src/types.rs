@@ -5,7 +5,9 @@ use core_rpc::Auth as InnerAuth;
 use fatcrab_trading::common::BlockchainInfo as InnerBlockchainInfo;
 use fatcrab_trading::RelayInfo as InnerRelayInfo;
 use fatcrab_trading::RelayInformationDocument as InnerRelayInformationDocument;
-pub use fatcrab_trading::{maker::FatCrabMakerNotif, taker::FatCrabTakerNotif, RelayStatus};
+pub use fatcrab_trading::{
+    common::ProductionLevel, maker::FatCrabMakerNotif, taker::FatCrabTakerNotif, RelayStatus,
+};
 
 use crate::maker::FatCrabMakerNotifOfferStruct;
 use crate::maker::FatCrabMakerNotifPeerStruct;

@@ -4,18 +4,17 @@ use std::str::FromStr;
 use std::sync::Arc;
 
 use bitcoin::{Address, Network};
-use fatcrab_trading::order::FatCrabOrderType;
 use secp256k1::SecretKey;
+use url::Url;
 
 pub use fatcrab_trading::common::Balances;
-use fatcrab_trading::trader::FatCrabTrader as InnerTrader;
-use url::Url;
+use fatcrab_trading::{order::FatCrabOrderType, trader::FatCrabTrader as InnerTrader};
 
 use crate::error::FatCrabError;
 use crate::maker::{FatCrabBuyMaker, FatCrabSellMaker};
 use crate::order::{FatCrabOrder, FatCrabOrderEnvelope};
 use crate::taker::{FatCrabBuyTaker, FatCrabSellTaker};
-use crate::types::{BlockchainInfo, RelayAddr, RelayInfo};
+use crate::types::{BlockchainInfo, ProductionLevel, RelayAddr, RelayInfo};
 use crate::RUNTIME;
 
 pub struct FatCrabTrader {
@@ -24,19 +23,25 @@ pub struct FatCrabTrader {
 }
 
 impl FatCrabTrader {
-    pub fn new(info: BlockchainInfo, app_dir_path: String) -> Self {
+    pub fn new(prod_lvl: ProductionLevel, info: BlockchainInfo, app_dir_path: String) -> Self {
         let network = match &info {
             BlockchainInfo::Electrum { network, .. } => network.to_owned(),
             BlockchainInfo::Rpc { network, .. } => network.to_owned(),
         };
-        let inner = RUNTIME.block_on(async { InnerTrader::new(info.into(), app_dir_path).await });
+        let inner =
+            RUNTIME.block_on(async { InnerTrader::new(prod_lvl, info.into(), app_dir_path).await });
         Self {
             inner,
             network: network.into(),
         }
     }
 
-    pub fn new_with_mnemonic(mnemonic: String, info: BlockchainInfo, app_dir_path: String) -> Self {
+    pub fn new_with_mnemonic(
+        prod_lvl: ProductionLevel,
+        mnemonic: String,
+        info: BlockchainInfo,
+        app_dir_path: String,
+    ) -> Self {
         let network = match &info {
             BlockchainInfo::Electrum { network, .. } => network.to_owned(),
             BlockchainInfo::Rpc { network, .. } => network.to_owned(),
@@ -50,7 +55,7 @@ impl FatCrabTrader {
             Err(error) => panic!("Cannot make key from mnemonic - {}", error),
         };
         let inner = RUNTIME.block_on(async {
-            InnerTrader::new_with_key(secret_key, info.into(), app_dir_path).await
+            InnerTrader::new_with_key(prod_lvl, secret_key, info.into(), app_dir_path).await
         });
         Self {
             inner,

@@ -33,7 +33,7 @@ use trade_rsp::{FatCrabTradeRsp, FatCrabTradeRspEnvelope, FatCrabTradeRspType};
 use trader::{Balances, FatCrabTrader};
 use types::{
     Auth, BlockchainInfo, FatCrabMakerNotifDelegate, FatCrabTakerNotifDelegate, FilterLevel,
-    Network, RelayAddr, RelayInfo, RelayInformationDocument, RelayStatus,
+    Network, ProductionLevel, RelayAddr, RelayInfo, RelayInformationDocument, RelayStatus,
 };
 
 // Init tracing for Apple unified logging system

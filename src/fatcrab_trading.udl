@@ -41,6 +41,11 @@ enum Network {
   "Regtest",
 };
 
+enum ProductionLevel {
+  "Debug",
+  "Production",
+};
+
 [Enum]
 interface BlockchainInfo {
   Electrum(string url, Network network);
@@ -295,9 +300,9 @@ interface FatCrabSellTaker {
 };
 
 interface FatCrabTrader {
-    constructor(BlockchainInfo info, string app_dir_path);
+    constructor(ProductionLevel prod_lvl, BlockchainInfo info, string app_dir_path);
     [Name=new_with_mnemonic]
-    constructor(string mnemonic, BlockchainInfo info, string app_dir_path);
+    constructor(ProductionLevel prod_lvl, string mnemonic, BlockchainInfo info, string app_dir_path);
     [Throws=FatCrabError]
     string wallet_bip39_mnemonic();
     [Throws=FatCrabError]
