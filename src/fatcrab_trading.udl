@@ -112,6 +112,7 @@ dictionary FatCrabOrder {
   string trade_uuid;
   f64 amount;
   f64 price;
+  Network network;
 };
 
 [Enum]
@@ -316,6 +317,7 @@ interface FatCrabTrader {
     [Throws=FatCrabError]
     void wallet_blockchain_sync();
     string nostr_pubkey();
+    Network get_network();
     [Throws=FatCrabError]
     void add_relays(sequence<RelayAddr> relay_addrs);
     sequence<RelayInfo> get_relays();

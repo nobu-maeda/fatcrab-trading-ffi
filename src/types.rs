@@ -72,6 +72,18 @@ impl From<Network> for InnerNetwork {
     }
 }
 
+impl Into<Network> for InnerNetwork {
+    fn into(self) -> Network {
+        match self {
+            InnerNetwork::Bitcoin => Network::Bitcoin,
+            InnerNetwork::Testnet => Network::Testnet,
+            InnerNetwork::Signet => Network::Signet,
+            InnerNetwork::Regtest => Network::Regtest,
+            _ => panic!("InnerNetwork::into() - Unexpected network"),
+        }
+    }
+}
+
 pub enum BlockchainInfo {
     Electrum {
         url: String,

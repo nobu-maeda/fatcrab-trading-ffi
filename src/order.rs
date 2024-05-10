@@ -4,6 +4,8 @@ use fatcrab_trading::order::FatCrabOrder as InnerOrder;
 use fatcrab_trading::order::FatCrabOrderEnvelope as InnerEnvelope;
 pub use fatcrab_trading::order::FatCrabOrderType;
 
+use crate::types::Network;
+
 #[derive(Clone)]
 pub struct FatCrabOrderEnvelope {
     inner: InnerEnvelope,
@@ -36,6 +38,7 @@ pub struct FatCrabOrder {
     pub trade_uuid: String,
     pub amount: f64, // in FC
     pub price: f64,
+    pub network: Network,
 }
 
 impl From<InnerOrder> for FatCrabOrder {
@@ -45,6 +48,7 @@ impl From<InnerOrder> for FatCrabOrder {
             trade_uuid: order.trade_uuid.to_string(),
             amount: order.amount,
             price: order.price,
+            network: order.network.into(),
         }
     }
 }
@@ -56,6 +60,7 @@ impl Into<InnerOrder> for FatCrabOrder {
             trade_uuid: Uuid::parse_str(&self.trade_uuid).unwrap(),
             amount: self.amount,
             price: self.price,
+            network: self.network.into(),
         }
     }
 }

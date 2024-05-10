@@ -3,7 +3,7 @@ use std::net::SocketAddr;
 use std::str::FromStr;
 use std::sync::Arc;
 
-use bitcoin::{Address, Network};
+use bitcoin::Address;
 use secp256k1::SecretKey;
 use url::Url;
 
@@ -14,26 +14,18 @@ use crate::error::FatCrabError;
 use crate::maker::{FatCrabBuyMaker, FatCrabSellMaker};
 use crate::order::{FatCrabOrder, FatCrabOrderEnvelope};
 use crate::taker::{FatCrabBuyTaker, FatCrabSellTaker};
-use crate::types::{BlockchainInfo, ProductionLevel, RelayAddr, RelayInfo};
+use crate::types::{BlockchainInfo, Network, ProductionLevel, RelayAddr, RelayInfo};
 use crate::RUNTIME;
 
 pub struct FatCrabTrader {
     inner: InnerTrader,
-    network: Network,
 }
 
 impl FatCrabTrader {
     pub fn new(prod_lvl: ProductionLevel, info: BlockchainInfo, app_dir_path: String) -> Self {
-        let network = match &info {
-            BlockchainInfo::Electrum { network, .. } => network.to_owned(),
-            BlockchainInfo::Rpc { network, .. } => network.to_owned(),
-        };
         let inner =
             RUNTIME.block_on(async { InnerTrader::new(prod_lvl, info.into(), app_dir_path).await });
-        Self {
-            inner,
-            network: network.into(),
-        }
+        Self { inner }
     }
 
     pub fn new_with_mnemonic(
@@ -42,10 +34,6 @@ impl FatCrabTrader {
         info: BlockchainInfo,
         app_dir_path: String,
     ) -> Self {
-        let network = match &info {
-            BlockchainInfo::Electrum { network, .. } => network.to_owned(),
-            BlockchainInfo::Rpc { network, .. } => network.to_owned(),
-        };
         let entropy = match bip39::Mnemonic::parse(mnemonic) {
             Ok(mnemonic) => mnemonic.to_entropy(),
             Err(error) => panic!("Invalid mnemonic - {}", error),
@@ -57,10 +45,7 @@ impl FatCrabTrader {
         let inner = RUNTIME.block_on(async {
             InnerTrader::new_with_key(prod_lvl, secret_key, info.into(), app_dir_path).await
         });
-        Self {
-            inner,
-            network: network.into(),
-        }
+        Self { inner }
     }
 
     pub fn wallet_bip39_mnemonic(&self) -> Result<String, FatCrabError> {
@@ -91,7 +76,7 @@ impl FatCrabTrader {
         amount: u64,
     ) -> Result<String, FatCrabError> {
         let address = Address::from_str(&address).unwrap();
-        let address = address.require_network(self.network).unwrap();
+        let address = address.require_network(self.inner.get_network()).unwrap();
         let result =
             RUNTIME.block_on(async { self.inner.wallet_send_to_address(address, amount).await });
         match result {
@@ -116,6 +101,10 @@ impl FatCrabTrader {
         RUNTIME
             .block_on(async { self.inner.nostr_pubkey().await })
             .to_string()
+    }
+
+    pub fn get_network(&self) -> Network {
+        self.inner.get_network().into()
     }
 
     pub fn add_relays(&self, relay_addrs: Vec<RelayAddr>) -> Result<(), FatCrabError> {
